@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Hotel{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-5 text-center">
+                <h2 class="card-title mb-3">Bienvenido, {{ user.username }}</h2>
+                <p class="text-muted mb-4">
+                    Rol: <span class="badge bg-secondary">{{ user.get_role_display }}</span>
+                </p>
+
+                {% if user.role == 'admin' %}
+                    <div class="alert alert-info" role="alert">
+                        <strong>Panel de administrador</strong>
+                        <p class="mb-0 mt-2">Tienes acceso a las funciones de administración del hotel.</p>
+                    </div>
+                {% elif user.role == 'cliente' %}
+                    <div class="alert alert-success" role="alert">
+                        <strong>Zona de cliente</strong>
+                        <p class="mb-0 mt-2">Bienvenido a tu espacio personal en el hotel.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
