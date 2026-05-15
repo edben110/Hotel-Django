@@ -9,7 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 def send_verification_email(request, user, token):
-    """Envía correo de verificación con enlace que contiene el token."""
+    """Envía correo de verificación con enlace que contiene el token.
+
+    Devuelve True cuando el correo se envía o se registra sin bloquear.
+    Devuelve False si el backend SMTP falla o no puede conectar.
+    """
     try:
         verification_path = reverse('verify_email')
         verification_url = request.build_absolute_uri(verification_path)
@@ -29,9 +33,15 @@ def send_verification_email(request, user, token):
         if not settings.EMAIL_HOST and 'console' not in settings.EMAIL_BACKEND.lower():
             logger.warning("Correo de verificación no enviado porque EMAIL_HOST no está configurado.")
             logger.info("Token de verificación para %s: %s", user.email, verification_url)
-            return
+            return False
 
         send_mail(subject, message, None, [user.email], fail_silently=False)
+        return True
+    except OSError as exc:
+        logger.warning("No se pudo conectar al servidor SMTP para %s: %s", user.email, exc)
+        logger.info("Token de verificación para %s: %s", user.email, verification_url)
+        return False
     except Exception as e:
-        logger.exception("Error al enviar correo de verificación: %s", e)
-        raise
+        logger.warning("Error al enviar correo de verificación para %s: %s", user.email, e)
+        logger.info("Token de verificación para %s: %s", user.email, verification_url)
+        return False
