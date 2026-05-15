@@ -19,10 +19,12 @@ RESERVA_ESTADOS_OCUPACION = ['confirmada', 'completada']
 
 def obtener_metricas_dashboard() -> dict:
     hoy = timezone.localdate()
-    total_habitaciones = Habitacion.objects.count()
+    total_habitaciones = Habitacion.objects.filter(activa=True).count()
     total_reservas = Reserva.objects.count()
     reservas_activas = Reserva.objects.filter(estado__in=['pendiente', 'confirmada']).count()
-    habitaciones_disponibles = Habitacion.objects.filter(estado='disponible').count()
+    reservas_canceladas = Reserva.objects.filter(estado='cancelada').count()
+    habitaciones_disponibles = Habitacion.objects.filter(estado='disponible', activa=True).count()
+    habitaciones_ocupadas = Habitacion.objects.filter(estado='ocupada', activa=True).count()
     total_clientes = Reserva.objects.values('nombre_cliente', 'email_cliente').distinct().count()
 
     reservas_activas_hoy = Reserva.objects.filter(
@@ -40,7 +42,9 @@ def obtener_metricas_dashboard() -> dict:
         'total_habitaciones': total_habitaciones,
         'total_reservas': total_reservas,
         'reservas_activas': reservas_activas,
+        'reservas_canceladas': reservas_canceladas,
         'habitaciones_disponibles': habitaciones_disponibles,
+        'habitaciones_ocupadas': habitaciones_ocupadas,
         'tasa_ocupacion_general': tasa_ocupacion_general,
     }
 
@@ -105,7 +109,7 @@ def _reservas_por_mes() -> dict:
 
 
 def _ocupacion_por_mes() -> dict:
-    total_habitaciones = Habitacion.objects.count()
+    total_habitaciones = Habitacion.objects.filter(activa=True).count()
     meses = _ultimos_meses(12)
     reservas = list(
         Reserva.objects.filter(

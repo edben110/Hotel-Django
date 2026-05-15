@@ -158,5 +158,35 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
-    """Vista principal protegida para usuarios autenticados."""
-    return render(request, 'authapp/home.html')
+    """Vista principal protegida — dashboard dinámico según rol."""
+    from habitaciones.models import Habitacion
+    from reservas.models import Reserva
+
+    context = {}
+
+    if request.user.role == 'admin':
+        # Reutilizar lógica existente del módulo reportes
+        from reportes.services import obtener_metricas_dashboard, obtener_actividad_reciente, obtener_datos_dashboard
+        from django.urls import reverse
+
+        context['metricas'] = obtener_metricas_dashboard()
+        context['actividad'] = obtener_actividad_reciente()
+        context['dashboard_data_url'] = reverse('reportes:dashboard_data')
+
+    else:
+        # Cliente: habitaciones disponibles y reservas activas
+        habitaciones_disponibles = Habitacion.objects.filter(
+            estado='disponible', activa=True
+        ).select_related('tipo')[:6]
+
+        reservas_activas = Reserva.objects.filter(
+            usuario=request.user,
+            estado__in=['pendiente', 'confirmada'],
+        ).select_related('habitacion__tipo').order_by('-fecha_creacion')[:5]
+
+        context['habitaciones_disponibles'] = habitaciones_disponibles
+        context['reservas_activas'] = reservas_activas
+        context['total_reservas_activas'] = reservas_activas.count() if hasattr(reservas_activas, 'count') else len(reservas_activas)
+        context['total_habitaciones_disponibles'] = Habitacion.objects.filter(estado='disponible', activa=True).count()
+
+    return render(request, 'authapp/home.html', context)

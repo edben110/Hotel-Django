@@ -9,6 +9,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Iterable
 
+from django.utils import timezone
+
 from django.db.models import Q
 
 from habitaciones.models import Habitacion
@@ -109,11 +111,16 @@ class ValidacionFechasError(Exception):
 
 def validar_fechas(fecha_entrada: date, fecha_salida: date,
                    hoy: date | None = None) -> None:
-    hoy = hoy or date.today()
+    hoy = hoy or timezone.localdate()
     if fecha_entrada < hoy:
-        raise ValidacionFechasError("La fecha de entrada no puede estar en el pasado.")
+        raise ValidacionFechasError(
+            "La fecha de entrada no puede ser anterior a hoy "
+            f"({hoy.strftime('%d/%m/%Y')})."
+        )
     if fecha_salida <= fecha_entrada:
-        raise ValidacionFechasError("La fecha de salida debe ser posterior a la de entrada.")
+        raise ValidacionFechasError(
+            "La fecha de salida debe ser posterior a la fecha de entrada."
+        )
 
 
 def hay_solapamiento(habitacion: Habitacion, fecha_entrada: date,

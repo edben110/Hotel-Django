@@ -45,9 +45,16 @@
 </div>
 
 <div class="mt-3">
+    {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
+    <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success">
+        <i class="bi bi-cart-plus"></i> Reservar esta habitación
+    </a>
+    {% endif %}
+    {% if request.user.role == 'admin' %}
     <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="btn btn-warning">
         <i class="bi bi-pencil"></i> Editar
     </a>
+    {% endif %}
     <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-secondary">
         <i class="bi bi-arrow-left"></i> Volver
     </a>

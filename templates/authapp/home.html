@@ -3,28 +3,462 @@
 {% block title %}Inicio - Hotel{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-body p-5 text-center">
-                <h2 class="card-title mb-3">Bienvenido, {{ user.username }}</h2>
-                <p class="text-muted mb-4">
-                    Rol: <span class="badge bg-secondary">{{ user.get_role_display }}</span>
-                </p>
+{% if user.role == 'admin' %}
+{# ===== DASHBOARD ADMINISTRATIVO ===== #}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);
+        color: #fff;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        position: relative;
+    }
+    .dashboard-hero::after {
+        content: '';
+        position: absolute;
+        inset: auto -10% -40% auto;
+        width: 18rem;
+        height: 18rem;
+        background: rgba(255,255,255,.08);
+        border-radius: 999px;
+    }
+    .stat-card {
+        border: 0;
+        border-radius: 1.25rem;
+        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+    }
+    .chart-card {
+        border: 0;
+        border-radius: 1.25rem;
+        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+        min-height: 100%;
+    }
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    .section-label {
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        font-size: .75rem;
+        color: #64748b;
+    }
+</style>
 
-                {% if user.role == 'admin' %}
-                    <div class="alert alert-info" role="alert">
-                        <strong>Panel de administrador</strong>
-                        <p class="mb-0 mt-2">Tienes acceso a las funciones de administración del hotel.</p>
-                    </div>
-                {% elif user.role == 'cliente' %}
-                    <div class="alert alert-success" role="alert">
-                        <strong>Zona de cliente</strong>
-                        <p class="mb-0 mt-2">Bienvenido a tu espacio personal en el hotel.</p>
-                    </div>
-                {% endif %}
+<div class="dashboard-hero p-4 p-lg-5 mb-4">
+    <div class="row align-items-end position-relative" style="z-index:1;">
+        <div class="col-lg-8">
+            <p class="section-label text-white-50 mb-2">Panel Administrativo</p>
+            <h1 class="display-6 fw-bold mb-2">Bienvenido, {{ user.username }}</h1>
+            <p class="mb-0 text-white-75">Dashboard de reservas, ocupación y reportes del hotel.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a class="btn btn-light btn-lg me-2" href="{% url 'reportes:reporte_reservas' %}">
+                <i class="bi bi-file-earmark-bar-graph"></i> Reportes
+            </a>
+            <a class="btn btn-outline-light btn-lg" href="{% url 'reportes:reporte_clientes' %}">
+                <i class="bi bi-people"></i> Clientes
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Métricas -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Clientes</div>
+                <div class="metric-value">{{ metricas.total_clientes }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Habitaciones</div>
+                <div class="metric-value">{{ metricas.total_habitaciones }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Disponibles</div>
+                <div class="metric-value text-success">{{ metricas.habitaciones_disponibles }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Ocupadas</div>
+                <div class="metric-value text-danger">{{ metricas.habitaciones_ocupadas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Reservas</div>
+                <div class="metric-value">{{ metricas.total_reservas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Reservas activas</div>
+                <div class="metric-value text-primary">{{ metricas.reservas_activas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Reservas canceladas</div>
+                <div class="metric-value text-warning">{{ metricas.reservas_canceladas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Ocupación</div>
+                <div class="metric-value">{{ metricas.tasa_ocupacion_general }}%</div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Actividad reciente -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3"><i class="bi bi-clock-history"></i> Últimas reservas</h5>
+            <div class="list-group list-group-flush">
+                {% for reserva in actividad.reservas_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="fw-semibold">{{ reserva.nombre_cliente }}</div>
+                                <div class="text-muted small">{{ reserva.habitacion.numero }} · {{ reserva.get_estado_display }}</div>
+                            </div>
+                            <div class="text-muted small">{{ reserva.fecha_creacion|date:'d/m/Y' }}</div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin reservas recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3"><i class="bi bi-people"></i> Últimos clientes</h5>
+            <div class="list-group list-group-flush">
+                {% for cliente in actividad.clientes_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="fw-semibold">{{ cliente.nombre_cliente }}</div>
+                        <div class="text-muted small">{{ cliente.email_cliente }}</div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin clientes recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3"><i class="bi bi-arrow-repeat"></i> Cambios recientes</h5>
+            <div class="list-group list-group-flush">
+                {% for habitacion in actividad.cambios_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="fw-semibold">Habitación {{ habitacion.numero }}</div>
+                        <div class="text-muted small">Actualizada {{ habitacion.fecha_actualizacion|date:'d/m/Y H:i' }}</div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin cambios recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Reservas por mes</h5>
+            <canvas id="chartReservasMes" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Ocupación por mes</h5>
+            <canvas id="chartOcupacionMes" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Habitación más reservada</h5>
+            <canvas id="chartHabitaciones" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Estado de reservas</h5>
+            <canvas id="chartEstados" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Clientes con más reservas</h5>
+            <canvas id="chartClientes" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+{% else %}
+{# ===== DASHBOARD CLIENTE ===== #}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded-4 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);">
+            <h2 class="fw-bold mb-1">Bienvenido, {{ user.username }}</h2>
+            <p class="mb-0 opacity-75">Encuentra tu habitación ideal y gestiona tus reservas.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen visual -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-calendar-check text-primary fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Reservas activas</div>
+                    <div class="fs-3 fw-bold">{{ total_reservas_activas }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-door-open text-success fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Habitaciones disponibles</div>
+                    <div class="fs-3 fw-bold">{{ total_habitaciones_disponibles }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos rápidos -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-search fs-1 text-primary"></i>
+                <h6 class="mt-2 mb-0 text-dark">Buscar disponibilidad</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'reservas:carrito_detail' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-cart3 fs-1 text-warning"></i>
+                <h6 class="mt-2 mb-0 text-dark">Mi carrito</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'reservas:buscar_reserva' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-receipt fs-1 text-info"></i>
+                <h6 class="mt-2 mb-0 text-dark">Consultar reserva</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Habitaciones disponibles -->
+<h4 class="mb-3"><i class="bi bi-door-open"></i> Habitaciones disponibles</h4>
+{% if habitaciones_disponibles %}
+<div class="row g-3 mb-4">
+    {% for habitacion in habitaciones_disponibles %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            {% if habitacion.imagen %}
+            <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                <i class="bi bi-image text-muted fs-1"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h6 class="card-title">Habitación {{ habitacion.numero }}</h6>
+                <p class="text-muted small mb-1">{{ habitacion.tipo.nombre }} · {{ habitacion.capacidad }} huésped{{ habitacion.capacidad|pluralize:"es" }}</p>
+                <p class="fw-bold text-primary mb-2">${{ habitacion.precio_por_noche }} / noche</p>
+                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-cart-plus"></i> Reservar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="text-center mb-4">
+    <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-outline-primary">
+        Ver todas las habitaciones <i class="bi bi-arrow-right"></i>
+    </a>
+</div>
+{% else %}
+<div class="alert alert-info">No hay habitaciones disponibles en este momento.</div>
+{% endif %}
+
+<!-- Reservas activas del usuario -->
+<h4 class="mb-3"><i class="bi bi-calendar-check"></i> Mis reservas activas</h4>
+{% if reservas_activas %}
+<div class="table-responsive mb-4">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Código</th>
+                <th>Habitación</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Estado</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas_activas %}
+            <tr>
+                <td><code>{{ reserva.codigo }}</code></td>
+                <td>{{ reserva.habitacion.numero }} - {{ reserva.habitacion.tipo.nombre }}</td>
+                <td>{{ reserva.fecha_entrada|date:"d/m/Y" }}</td>
+                <td>{{ reserva.fecha_salida|date:"d/m/Y" }}</td>
+                <td>
+                    <span class="badge bg-{% if reserva.estado == 'confirmada' %}success{% else %}warning{% endif %}">
+                        {{ reserva.get_estado_display }}
+                    </span>
+                </td>
+                <td>${{ reserva.total }}</td>
+                <td>
+                    <a href="{% url 'reservas:reserva_detail' reserva.codigo %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-light border">
+    <i class="bi bi-info-circle"></i> No tienes reservas activas.
+    <a href="{% url 'habitaciones:buscar_disponibilidad' %}">Buscar habitaciones</a>.
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.role == 'admin' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const dashboardDataUrl = "{{ dashboard_data_url }}";
+
+    const buildChart = (canvasId, config) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        new Chart(canvas, config);
+    };
+
+    fetch(dashboardDataUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            buildChart('chartReservasMes', {
+                type: 'line',
+                data: {
+                    labels: data.reservas_por_mes.labels,
+                    datasets: [{
+                        label: 'Reservas',
+                        data: data.reservas_por_mes.values,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, .15)',
+                        tension: .35,
+                        fill: true,
+                    }],
+                },
+                options: {responsive: true, plugins: {legend: {display: false}}},
+            });
+
+            buildChart('chartOcupacionMes', {
+                type: 'bar',
+                data: {
+                    labels: data.ocupacion_por_mes.labels,
+                    datasets: [{
+                        label: 'Ocupacion %',
+                        data: data.ocupacion_por_mes.values,
+                        backgroundColor: '#0f766e',
+                        borderRadius: 10,
+                    }],
+                },
+                options: {responsive: true, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, max: 100}}},
+            });
+
+            buildChart('chartHabitaciones', {
+                type: 'doughnut',
+                data: {
+                    labels: data.habitaciones_mas_reservadas.labels,
+                    datasets: [{
+                        data: data.habitaciones_mas_reservadas.values,
+                        backgroundColor: ['#1d4ed8', '#0ea5e9', '#14b8a6', '#f59e0b', '#ef4444'],
+                    }],
+                },
+                options: {responsive: true},
+            });
+
+            buildChart('chartEstados', {
+                type: 'pie',
+                data: {
+                    labels: data.estado_reservas.labels,
+                    datasets: [{
+                        data: data.estado_reservas.values,
+                        backgroundColor: ['#f59e0b', '#2563eb', '#ef4444', '#16a34a'],
+                    }],
+                },
+                options: {responsive: true},
+            });
+
+            buildChart('chartClientes', {
+                type: 'bar',
+                data: {
+                    labels: data.clientes_mas_reservas.labels,
+                    datasets: [{
+                        label: 'Reservas',
+                        data: data.clientes_mas_reservas.values,
+                        backgroundColor: '#7c3aed',
+                        borderRadius: 10,
+                    }],
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {legend: {display: false}},
+                },
+            });
+        });
+</script>
+{% endif %}
 {% endblock %}

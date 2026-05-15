@@ -71,6 +71,11 @@
                         <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-sm btn-outline-primary">
                             Ver detalles
                         </a>
+                        {% if request.user.is_authenticated and request.user.role == 'cliente' %}
+                        <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}?fecha_entrada={{ form.fecha_entrada.value|default:'' }}&fecha_salida={{ form.fecha_salida.value|default:'' }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-cart-plus"></i> Reservar
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
