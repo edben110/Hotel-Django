@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Confirmar reserva y pago{% endblock %}
+{% block title %}Confirmar reserva{% endblock %}
 
 {% block content %}
-<h1><i class="bi bi-credit-card"></i> Confirmar y pagar</h1>
+<h1>Confirmar reserva</h1>
+<p class="text-muted">Completa tus datos. El siguiente paso es el pago seguro a través de <strong>HotelPay</strong>.</p>
 
 <form method="post" novalidate>
     {% csrf_token %}
@@ -20,53 +21,6 @@
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
                     </div>
                     {% endfor %}
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header"><strong>Pago (simulado)</strong></div>
-                <div class="card-body">
-                    {% if pago_form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {% for error in pago_form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
-                        </div>
-                    {% endif %}
-
-                    <div class="mb-3">
-                        <label class="form-label">Método</label>
-                        {{ pago_form.metodo }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Titular</label>
-                        {{ pago_form.titular }}
-                        {% for error in pago_form.titular.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Número de tarjeta</label>
-                        {{ pago_form.numero_tarjeta }}
-                        <small class="form-text text-muted">Pasa la validación de Luhn. Ej: 4111 1111 1111 1111</small>
-                        {% for error in pago_form.numero_tarjeta.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Expiración</label>
-                            {{ pago_form.expiracion }}
-                            {% for error in pago_form.expiracion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">CVV</label>
-                            {{ pago_form.cvv }}
-                            {% for error in pago_form.cvv.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle"></i>
-                        Esta es una pasarela <strong>simulada</strong>. No se procesa ningún cobro real.
-                    </div>
                 </div>
             </div>
         </div>
@@ -95,8 +49,8 @@
                     </li>
                 </ul>
                 <div class="card-body">
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="bi bi-lock"></i> Pagar ${{ total }}
+                    <button type="submit" class="btn btn-primary w-100">
+                        Continuar al pago <i class="bi bi-arrow-right"></i>
                     </button>
                     <a href="{% url 'reservas:carrito_detail' %}" class="btn btn-link w-100">Volver al carrito</a>
                 </div>

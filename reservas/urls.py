@@ -14,9 +14,14 @@ urlpatterns = [
     path('carrito/quitar/<int:habitacion_pk>/', views.carrito_quitar, name='carrito_quitar'),
     path('carrito/vaciar/', views.carrito_vaciar, name='carrito_vaciar'),
 
-    # Checkout / pago simulado
+    # Checkout (recoge datos del cliente y abre la pasarela)
     path('checkout/', views.checkout, name='checkout'),
     path('checkout/exito/', views.checkout_exito, name='checkout_exito'),
+
+    # Pasarela simulada HotelPay (callback debe ir antes que <token>)
+    path('hotelpay/callback/', views.pago_callback, name='pago_callback'),
+    path('hotelpay/<str:token>/resultado/', views.gateway_resultado, name='gateway_resultado'),
+    path('hotelpay/<str:token>/', views.gateway_checkout, name='gateway_checkout'),
 
     # Consulta y cancelación
     path('buscar/', views.buscar_reserva, name='buscar_reserva'),

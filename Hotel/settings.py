@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'reservas',
     'reportes',
     'authapp',
+    'habitaciones',
+    'reservas',
 ]
 
 MIDDLEWARE = [
