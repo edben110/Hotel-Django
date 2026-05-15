@@ -26,10 +26,8 @@ urlpatterns = [
     path('auth/', include('authapp.urls')),
     path('habitaciones/', include('habitaciones.urls')),
     path('reservas/', include('reservas.urls')),
-<<<<<<< HEAD
     path('reportes/', include('reportes.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

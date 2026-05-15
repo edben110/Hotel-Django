@@ -141,9 +141,8 @@ def checkout(request):
 
     if request.method == 'POST':
         cliente_form = DatosClienteForm(request.POST)
-        pago_form = PagoForm(request.POST)
-        if cliente_form.is_valid() and pago_form.is_valid():
-            reservas = _procesar_checkout(request.user, carrito, items, cliente_form.cleaned_data, pago_form.cleaned_data)
+        if cliente_form.is_valid():
+            reservas = _crear_reservas_pendientes(request.user, items, cliente_form.cleaned_data)
             carrito.vaciar()
 
             sesion = gateway.crear_sesion(
@@ -168,8 +167,8 @@ def checkout(request):
 
 
 @transaction.atomic
-def _procesar_checkout(usuario, carrito, items, datos_cliente, datos_pago):
-    """Crea las reservas, registra el pago simulado y las confirma."""
+def _crear_reservas_pendientes(usuario, items, datos_cliente):
+    """Crea las reservas en estado pendiente."""
     creadas = []
     for item in items:
         reserva = Reserva.objects.create(
@@ -185,38 +184,17 @@ def _procesar_checkout(usuario, carrito, items, datos_cliente, datos_pago):
             total=item.subtotal,
             estado='pendiente',
         )
-
-        ultimos_4 = ''
-        if datos_pago['metodo'] == 'tarjeta':
-            numero = datos_pago.get('numero_tarjeta') or ''
-            ultimos_4 = numero[-4:] if numero else ''
-
-        Pago.objects.create(
-            reserva=reserva,
-            metodo=datos_pago['metodo'],
-            estado='aprobado',
-            referencia=f"PAY-{secrets.token_hex(8).upper()}",
-            titular=datos_pago.get('titular', ''),
-            ultimos_4=ultimos_4,
-            monto=reserva.total,
-        )
-
-        reserva.estado = 'confirmada'
-        reserva.save(update_fields=['estado'])
-
-        # Actualizar estado de la habitación a ocupada
-        habitacion = reserva.habitacion
-        habitacion.estado = 'ocupada'
-        habitacion.save(update_fields=['estado'])
-
         creadas.append(reserva)
     return creadas
 
 
-@login_required
-def checkout_exito(request):
-    codigos = request.session.pop('ultimas_reservas', [])
-    if not codigos:
+# ============================ PASARELA "HotelPay" ============================
+
+def gateway_checkout(request, token):
+    """Pantalla de la pasarela: muestra branding HotelPay y pide la tarjeta."""
+    sesion = gateway.obtener_sesion(token)
+    if not sesion:
+        messages.error(request, "La sesión de pago expiró o no es válida.")
         return redirect('reservas:carrito_detail')
 
     if sesion.estado in ('aprobada', 'rechazada'):
@@ -263,7 +241,7 @@ def checkout_exito(request):
 def pago_callback(request):
     """Endpoint que la pasarela invoca tras procesar.
 
-    Lee el resultado de la sesión, registra el `Pago` y confirma o
+    Lee el resultado de la sesión, registra el Pago y confirma o
     cancela las reservas asociadas.
     """
     token = request.GET.get('token') or request.session.get('hotelpay_token')
@@ -277,7 +255,6 @@ def pago_callback(request):
 
     resultado = request.session.pop('hotelpay_resultado_' + token, None)
     if not resultado:
-        # alguien aterrizó sin haber procesado: mandar de vuelta a la pasarela
         return redirect('reservas:gateway_checkout', token=token)
 
     codigos = sesion.metadata.get('reservas', [])
@@ -291,7 +268,7 @@ def pago_callback(request):
                     metodo='tarjeta',
                     estado='aprobado' if resultado['aprobado'] else 'rechazado',
                     referencia=f"{resultado['referencia']}-{reserva.codigo}",
-                    titular='',  # no almacenamos PII detallada
+                    titular='',
                     ultimos_4=resultado['ultimos_4'],
                     monto=reserva.total,
                 ),
@@ -300,6 +277,12 @@ def pago_callback(request):
             if not resultado['aprobado']:
                 reserva.motivo_cancelacion = f"Pago rechazado: {resultado['mensaje']}"
             reserva.save(update_fields=['estado', 'motivo_cancelacion'])
+
+            # Si fue aprobado, marcar habitación como ocupada
+            if resultado['aprobado']:
+                habitacion = reserva.habitacion
+                habitacion.estado = 'ocupada'
+                habitacion.save(update_fields=['estado'])
 
     request.session['ultimas_reservas'] = codigos
     request.session['ultimo_pago'] = resultado
