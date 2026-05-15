@@ -146,8 +146,18 @@
         </div>
         {% else %}
         <div class="text-center py-5">
-            <i class="bi bi-emoji-frown" style="font-size:3rem; color:#b8860b; opacity:.4;"></i>
-            <h5 class="mt-2" style="color:#1a1a1a; font-family:'Playfair Display',serif;">No se encontraron habitaciones</h5>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" fill="none" style="width:160px; height:auto; margin-bottom:1.5rem;">
+                <!-- Lupa -->
+                <circle cx="90" cy="75" r="35" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.04)"/>
+                <line x1="115" y1="100" x2="145" y2="130" stroke="#b8860b" stroke-width="3" stroke-linecap="round"/>
+                <!-- Estrella dentro de lupa -->
+                <path d="M90 58 L93 68 L103 68 L95 74 L98 84 L90 78 L82 84 L85 74 L77 68 L87 68 Z" stroke="#b8860b" stroke-width="1" fill="rgba(184,134,11,.1)"/>
+                <!-- Decoración -->
+                <circle cx="40" cy="50" r="2" fill="#b8860b" opacity=".3"/>
+                <circle cx="155" cy="45" r="2" fill="#b8860b" opacity=".2"/>
+                <line x1="30" y1="145" x2="170" y2="145" stroke="#e8e0d5" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h5 style="color:#1a1a1a; font-family:'Playfair Display',serif;">No se encontraron habitaciones</h5>
             <p style="color:#999; font-size:.88rem;">Intenta con otras fechas o criterios de búsqueda.</p>
         </div>
         {% endif %}

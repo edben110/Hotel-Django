@@ -1,122 +1,89 @@
 {% extends "base.html" %}
 
-{% block title %}Confirmar reserva{% endblock %}
+{% block title %}Confirmar reserva - Áurea{% endblock %}
 
 {% block content %}
 <style>
-    .checkout-header {
-        margin-bottom: 2rem;
-    }
-    .checkout-header h1 {
-        font-weight: 800;
-        font-size: 1.6rem;
-        color: var(--hotel-dark);
-    }
-    .checkout-form-card {
-        border: none;
-        border-radius: var(--hotel-radius-lg);
-        box-shadow: var(--hotel-shadow-lg);
-    }
-    .checkout-form-card .card-header {
-        background: var(--hotel-dark);
-        color: #fff;
-        border-radius: var(--hotel-radius-lg) var(--hotel-radius-lg) 0 0 !important;
-        padding: 1.25rem 1.5rem;
-        font-weight: 600;
-    }
-    .checkout-form-card .card-body {
-        padding: 1.75rem;
-    }
-    .checkout-summary {
-        border: none;
-        border-radius: var(--hotel-radius-lg);
-        box-shadow: var(--hotel-shadow-lg);
-        position: sticky;
-        top: 80px;
-    }
-    .checkout-summary .card-header {
-        background: linear-gradient(135deg, var(--hotel-primary), var(--hotel-accent));
-        color: #fff;
-        border-radius: var(--hotel-radius-lg) var(--hotel-radius-lg) 0 0 !important;
-        padding: 1.25rem 1.5rem;
-        font-weight: 600;
-    }
-    .checkout-summary .list-group-item {
-        border-color: var(--hotel-border);
-        padding: 1rem 1.25rem;
-    }
-    .checkout-summary .total-row {
-        background: var(--hotel-light);
-        font-size: 1.1rem;
-    }
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card { background:linear-gradient(145deg,#1a1a1a,#2c2c2c,#1f1a14); border-radius:1.5rem; padding:2rem 2.5rem; color:#fff; margin-bottom:2rem; border:1px solid rgba(184,134,11,.25); box-shadow:0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden; }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+
+    .form-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; }
+    .form-card .form-header { background:#1a1a1a; padding:1.25rem 1.5rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }
+    .form-card .form-header h5 { font-family:'Playfair Display',serif; font-weight:600; font-size:1rem; margin:0; }
+    .form-card .form-body { padding:1.75rem; }
+    .form-card .form-control, .form-card .form-select { border:1px solid #e8e0d5; background:#faf8f5; border-radius:.5rem; padding:.7rem 1rem; }
+    .form-card .form-control:focus, .form-card .form-select:focus { border-color:#b8860b; box-shadow:0 0 0 3px rgba(184,134,11,.1); background:#fff; }
+
+    .summary-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; position:sticky; top:80px; }
+    .summary-card .summary-header { background:linear-gradient(145deg,#1a1a1a,#2c2c2c); padding:1.25rem 1.5rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }
+    .summary-card .summary-header h5 { font-family:'Playfair Display',serif; font-weight:600; font-size:1rem; margin:0; }
+    .summary-card .list-group-item { border-color:rgba(184,134,11,.06); padding:1rem 1.5rem; }
+    .summary-card .total-row { background:rgba(184,134,11,.04); }
+
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.75rem 1.25rem; font-weight:600; font-size:.9rem; transition:all .2s; width:100%; display:block; text-align:center; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
 </style>
 
-<div class="checkout-header fade-in-up">
-    <h1><i class="bi bi-credit-card"></i> Confirmar reserva</h1>
-    <p class="text-muted">Completa tus datos. El siguiente paso es el pago seguro a través de <strong>HotelPay</strong>.</p>
-</div>
-
-<form method="post" novalidate>
-    {% csrf_token %}
-
-    <div class="row g-4 fade-in-up">
-        <div class="col-lg-7">
-            <div class="card checkout-form-card">
-                <div class="card-header">
-                    <i class="bi bi-person"></i> Datos del cliente
-                </div>
-                <div class="card-body">
-                    {% for field in cliente_form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="card checkout-summary">
-                <div class="card-header">
-                    <i class="bi bi-receipt"></i> Resumen de tu reserva
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for item in items %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>Hab. {{ item.habitacion.numero }}</strong>
-                                <div class="text-muted small mt-1">
-                                    <i class="bi bi-calendar-event"></i>
-                                    {{ item.fecha_entrada|date:"d/m/Y" }} → {{ item.fecha_salida|date:"d/m/Y" }}
-                                </div>
-                                <div class="text-muted small">
-                                    <i class="bi bi-moon"></i> {{ item.noches }} noche{{ item.noches|pluralize:"s" }}
-                                </div>
-                            </div>
-                            <span class="fw-bold">${{ item.subtotal }}</span>
-                        </div>
-                    </li>
-                    {% endfor %}
-                    <li class="list-group-item total-row d-flex justify-content-between">
-                        <strong>Total</strong>
-                        <strong class="text-primary">${{ total }}</strong>
-                    </li>
-                </ul>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            Continuar al pago <i class="bi bi-arrow-right"></i>
-                        </button>
-                        <a href="{% url 'reservas:carrito_detail' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Volver al carrito
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="position-relative" style="z-index:1;">
+            <h1><i class="bi bi-credit-card"></i> Confirmar reserva</h1>
+            <p>Completa tus datos. El siguiente paso es el pago seguro a través de HotelPay</p>
         </div>
     </div>
-</form>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-4 fade-in-up">
+            <div class="col-lg-7">
+                <div class="form-card">
+                    <div class="form-header"><h5><i class="bi bi-person"></i> Datos del cliente</h5></div>
+                    <div class="form-body">
+                        {% for field in cliente_form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="summary-card">
+                    <div class="summary-header"><h5><i class="bi bi-receipt"></i> Resumen de tu reserva</h5></div>
+                    <ul class="list-group list-group-flush">
+                        {% for item in items %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>Hab. {{ item.habitacion.numero }}</strong>
+                                    <div style="color:#999; font-size:.78rem; margin-top:.2rem;"><i class="bi bi-calendar-event"></i> {{ item.fecha_entrada|date:"d/m/Y" }} → {{ item.fecha_salida|date:"d/m/Y" }}</div>
+                                    <div style="color:#999; font-size:.78rem;"><i class="bi bi-moon"></i> {{ item.noches }} noche{{ item.noches|pluralize:"s" }}</div>
+                                </div>
+                                <span class="fw-bold" style="color:#b8860b;">${{ item.subtotal }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        <li class="list-group-item total-row d-flex justify-content-between">
+                            <strong>Total</strong>
+                            <strong style="color:#b8860b; font-size:1.1rem;">${{ total }}</strong>
+                        </li>
+                    </ul>
+                    <div style="padding:1.5rem;">
+                        <button type="submit" class="btn-gold mb-2">Continuar al pago <i class="bi bi-arrow-right"></i></button>
+                        <a href="{% url 'reservas:carrito_detail' %}" class="btn btn-outline-secondary w-100" style="border-radius:.5rem;"><i class="bi bi-arrow-left"></i> Volver al carrito</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 {% endblock %}

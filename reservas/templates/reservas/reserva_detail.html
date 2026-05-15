@@ -1,195 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}Reserva {{ reserva.codigo }}{% endblock %}
+{% block title %}Reserva {{ reserva.codigo }} - Áurea{% endblock %}
 
 {% block content %}
 <style>
-    .reserva-detail-header {
-        margin-bottom: 2rem;
-    }
-    .reserva-detail-header h1 {
-        font-weight: 800;
-        font-size: 1.5rem;
-        color: var(--hotel-dark);
-    }
-    .reserva-detail-header code {
-        font-size: 1rem;
-        background: var(--hotel-light);
-        padding: .3rem .75rem;
-        border-radius: .375rem;
-        color: var(--hotel-primary);
-        font-weight: 700;
-    }
-    .detail-card {
-        border: none;
-        border-radius: var(--hotel-radius-lg);
-        box-shadow: var(--hotel-shadow-lg);
-    }
-    .detail-card .card-body {
-        padding: 1.75rem;
-    }
-    .detail-card .detail-row {
-        display: flex;
-        padding: .85rem 0;
-        border-bottom: 1px solid var(--hotel-border);
-        align-items: center;
-    }
-    .detail-card .detail-row:last-child {
-        border-bottom: none;
-    }
-    .detail-card .detail-label {
-        font-size: .75rem;
-        text-transform: uppercase;
-        letter-spacing: .05em;
-        color: var(--hotel-gray);
-        font-weight: 600;
-        width: 160px;
-        flex-shrink: 0;
-    }
-    .detail-card .detail-value {
-        font-weight: 500;
-        color: var(--hotel-dark);
-    }
-    .cancel-card {
-        border: 2px solid #fbbf24;
-        border-radius: var(--hotel-radius);
-        background: #fffbeb;
-    }
-    .cancel-card .card-body {
-        padding: 1.5rem;
-    }
-    .payment-card {
-        border: none;
-        border-radius: var(--hotel-radius);
-        background: var(--hotel-light);
-    }
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card { background:linear-gradient(145deg,#1a1a1a,#2c2c2c,#1f1a14); border-radius:1.5rem; padding:1.75rem 2.5rem; color:#fff; margin-bottom:2rem; border:1px solid rgba(184,134,11,.25); box-shadow:0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden; }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.4rem; margin-bottom:.15rem; }
+    .page-header-card code { color:#b8860b; background:rgba(184,134,11,.15); padding:.2rem .6rem; border-radius:.25rem; font-size:.9rem; font-weight:700; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.85rem; }
+
+    .detail-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:2rem; margin-bottom:1.5rem; }
+    .detail-card h5 { font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; }
+    .detail-row { display:flex; padding:.85rem 0; border-bottom:1px solid rgba(184,134,11,.06); align-items:center; }
+    .detail-row:last-child { border-bottom:none; }
+    .detail-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#999; font-weight:600; width:150px; flex-shrink:0; }
+    .detail-value { font-weight:500; color:#1a1a1a; }
+
+    .payment-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:1.75rem; margin-bottom:1.5rem; }
+    .payment-card h5 { font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; }
+
+    .cancel-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:2px solid rgba(217,119,6,.3); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:1.75rem; margin-bottom:1.5rem; }
+    .cancel-card h5 { font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; }
+
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.6rem 1.25rem; font-weight:600; font-size:.85rem; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); }
+    .btn-back { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:.5rem; padding:.6rem 1.25rem; font-weight:600; font-size:.85rem; color:#666; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s; width:100%; justify-content:center; }
+    .btn-back:hover { border-color:#b8860b; color:#b8860b; }
 </style>
 
-<div class="reserva-detail-header fade-in-up">
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-        <div>
-            <h1><i class="bi bi-receipt"></i> Reserva <code>{{ reserva.codigo }}</code></h1>
-            <p class="text-muted mb-0">Creada el {{ reserva.fecha_creacion|date:"d/m/Y H:i" }}</p>
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 position-relative" style="z-index:1;">
+            <div>
+                <h1><i class="bi bi-receipt"></i> Reserva <code>{{ reserva.codigo }}</code></h1>
+                <p>Creada el {{ reserva.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            </div>
+            <span class="badge fs-6 bg-{% if reserva.estado == 'confirmada' %}success{% elif reserva.estado == 'pendiente' %}warning{% elif reserva.estado == 'cancelada' %}secondary{% else %}info{% endif %}" style="border-radius:2rem;">
+                {{ reserva.get_estado_display }}
+            </span>
         </div>
-        <span class="badge fs-6 bg-{% if reserva.estado == 'confirmada' %}success{% elif reserva.estado == 'pendiente' %}warning{% elif reserva.estado == 'cancelada' %}secondary{% else %}info{% endif %}">
-            {{ reserva.get_estado_display }}
-        </span>
     </div>
-</div>
 
-<div class="row g-4 fade-in-up">
-    <div class="col-lg-8">
-        <div class="card detail-card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">Detalles de la reserva</h5>
-
-                <div class="detail-row">
-                    <div class="detail-label">Habitación</div>
-                    <div class="detail-value">
-                        <a href="{% url 'habitaciones:habitacion_detail' reserva.habitacion.pk %}" class="text-decoration-none">
-                            {{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipo.nombre }}
-                        </a>
-                    </div>
-                </div>
-
-                <div class="detail-row">
-                    <div class="detail-label">Cliente</div>
-                    <div class="detail-value">{{ reserva.nombre_cliente }} ({{ reserva.email_cliente }})</div>
-                </div>
-
-                <div class="detail-row">
-                    <div class="detail-label">Fechas</div>
-                    <div class="detail-value">
-                        {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}
-                        <span class="badge bg-light text-dark ms-2">{{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}</span>
-                    </div>
-                </div>
-
-                <div class="detail-row">
-                    <div class="detail-label">Huéspedes</div>
-                    <div class="detail-value">{{ reserva.huespedes }}</div>
-                </div>
-
-                <div class="detail-row">
-                    <div class="detail-label">Precio/noche</div>
-                    <div class="detail-value">${{ reserva.precio_por_noche }}</div>
-                </div>
-
-                <div class="detail-row">
-                    <div class="detail-label">Total</div>
-                    <div class="detail-value fw-bold text-primary fs-5">${{ reserva.total }}</div>
-                </div>
+    <div class="row g-4 fade-in-up">
+        <div class="col-lg-8">
+            <div class="detail-card">
+                <h5 class="mb-3">Detalles de la reserva</h5>
+                <div class="detail-row"><div class="detail-label">Habitación</div><div class="detail-value"><a href="{% url 'habitaciones:habitacion_detail' reserva.habitacion.pk %}" style="color:#b8860b; text-decoration:none; font-weight:600;">{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipo.nombre }}</a></div></div>
+                <div class="detail-row"><div class="detail-label">Cliente</div><div class="detail-value">{{ reserva.nombre_cliente }} ({{ reserva.email_cliente }})</div></div>
+                <div class="detail-row"><div class="detail-label">Fechas</div><div class="detail-value">{{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }} <span class="badge" style="background:rgba(184,134,11,.08); color:#b8860b; font-weight:600; margin-left:.5rem;">{{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}</span></div></div>
+                <div class="detail-row"><div class="detail-label">Huéspedes</div><div class="detail-value">{{ reserva.huespedes }}</div></div>
+                <div class="detail-row"><div class="detail-label">Precio/noche</div><div class="detail-value">${{ reserva.precio_por_noche }}</div></div>
+                <div class="detail-row"><div class="detail-label">Total</div><div class="detail-value fw-bold fs-5" style="color:#b8860b;">${{ reserva.total }}</div></div>
 
                 {% if reserva.estado == 'cancelada' %}
-                <hr class="my-3">
-                <h6 class="fw-bold text-danger mb-3"><i class="bi bi-x-circle"></i> Información de cancelación</h6>
-                <div class="detail-row">
-                    <div class="detail-label">Cancelada el</div>
-                    <div class="detail-value">{{ reserva.fecha_cancelacion|date:"d/m/Y H:i" }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Motivo</div>
-                    <div class="detail-value">{{ reserva.motivo_cancelacion|default:"—" }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Reembolso</div>
-                    <div class="detail-value fw-bold">${{ reserva.monto_reembolsado }}</div>
-                </div>
+                <hr style="border-color:rgba(184,134,11,.1); margin:1.25rem 0;">
+                <h6 class="fw-bold" style="color:#dc2626;"><i class="bi bi-x-circle"></i> Cancelación</h6>
+                <div class="detail-row"><div class="detail-label">Cancelada el</div><div class="detail-value">{{ reserva.fecha_cancelacion|date:"d/m/Y H:i" }}</div></div>
+                <div class="detail-row"><div class="detail-label">Motivo</div><div class="detail-value">{{ reserva.motivo_cancelacion|default:"—" }}</div></div>
+                <div class="detail-row"><div class="detail-label">Reembolso</div><div class="detail-value fw-bold">${{ reserva.monto_reembolsado }}</div></div>
                 {% endif %}
             </div>
-        </div>
 
-        {% if reserva.pago %}
-        <div class="card payment-card mb-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-credit-card"></i> Información de pago</h5>
+            {% if reserva.pago %}
+            <div class="payment-card">
+                <h5 class="mb-3"><i class="bi bi-credit-card" style="color:#b8860b;"></i> Información de pago</h5>
                 <div class="row g-3">
-                    <div class="col-sm-6">
-                        <div class="small text-muted">Referencia</div>
-                        <div class="fw-semibold">{{ reserva.pago.referencia }}</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="small text-muted">Método</div>
-                        <div class="fw-semibold">{{ reserva.pago.get_metodo_display }}</div>
-                    </div>
-                    {% if reserva.pago.ultimos_4 %}
-                    <div class="col-sm-6">
-                        <div class="small text-muted">Tarjeta</div>
-                        <div class="fw-semibold">**** **** **** {{ reserva.pago.ultimos_4 }}</div>
-                    </div>
-                    {% endif %}
-                    <div class="col-sm-6">
-                        <div class="small text-muted">Estado</div>
-                        <div><span class="badge bg-success">{{ reserva.pago.get_estado_display }}</span></div>
-                    </div>
+                    <div class="col-sm-6"><div class="small" style="color:#999;">Referencia</div><div class="fw-semibold">{{ reserva.pago.referencia }}</div></div>
+                    <div class="col-sm-6"><div class="small" style="color:#999;">Método</div><div class="fw-semibold">{{ reserva.pago.get_metodo_display }}</div></div>
+                    {% if reserva.pago.ultimos_4 %}<div class="col-sm-6"><div class="small" style="color:#999;">Tarjeta</div><div class="fw-semibold">**** **** **** {{ reserva.pago.ultimos_4 }}</div></div>{% endif %}
+                    <div class="col-sm-6"><div class="small" style="color:#999;">Estado</div><div><span class="badge bg-success" style="border-radius:2rem;">{{ reserva.pago.get_estado_display }}</span></div></div>
                 </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
-    <div class="col-lg-4">
-        {% if reserva.puede_cancelarse %}
-        <div class="card cancel-card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle text-warning"></i> ¿Necesitas cancelar?</h5>
-                <p class="small text-muted mb-2">
-                    Faltan <strong>{{ reserva.dias_anticipacion }}</strong> día{{ reserva.dias_anticipacion|pluralize:"s" }}
-                    para tu fecha de entrada.
-                </p>
-                <p class="mb-3">
-                    Reembolso estimado: <strong class="text-success">${{ reembolso_estimado }}</strong>
-                </p>
-                <a href="{% url 'reservas:cancelar_reserva' codigo=reserva.codigo %}" class="btn btn-outline-danger w-100">
-                    <i class="bi bi-x-circle"></i> Cancelar reserva
-                </a>
+        <div class="col-lg-4">
+            {% if reserva.puede_cancelarse %}
+            <div class="cancel-card">
+                <h5 class="mb-2"><i class="bi bi-exclamation-triangle" style="color:#d97706;"></i> ¿Necesitas cancelar?</h5>
+                <p class="small" style="color:#666;">Faltan <strong>{{ reserva.dias_anticipacion }}</strong> día{{ reserva.dias_anticipacion|pluralize:"s" }} para tu entrada.</p>
+                <p class="mb-3">Reembolso estimado: <strong style="color:#16a34a;">${{ reembolso_estimado }}</strong></p>
+                <a href="{% url 'reservas:cancelar_reserva' codigo=reserva.codigo %}" class="btn btn-outline-danger w-100" style="border-radius:.5rem;"><i class="bi bi-x-circle"></i> Cancelar reserva</a>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
 
-        <a href="{% url 'reservas:buscar_reserva' %}" class="btn btn-outline-secondary w-100">
-            <i class="bi bi-arrow-left"></i> Buscar otra reserva
-        </a>
+            <a href="{% url 'reservas:buscar_reserva' %}" class="btn-back"><i class="bi bi-arrow-left"></i> Buscar otra reserva</a>
+        </div>
     </div>
 </div>
 {% endblock %}
