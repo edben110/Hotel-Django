@@ -4,5 +4,6 @@ psycopg2-binary
 dj-database-url
 python-decouple
 whitenoise
+django-cors-headers
 Pillow
 reportlab

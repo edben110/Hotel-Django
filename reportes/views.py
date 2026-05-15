@@ -6,10 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import landscape, A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from habitaciones.models import Habitacion
 from reservas.models import Reserva
@@ -26,7 +22,7 @@ from .services import (
 
 def _es_admin(request):
     """Verifica si el usuario es admin. Redirige con mensaje si no lo es."""
-    if request.user.role != 'admin':
+    if not request.user.is_authenticated or getattr(request.user, 'role', None) != 'admin':
         messages.error(request, 'No tienes permisos para acceder a esta sección.')
         return False
     return True
@@ -92,6 +88,7 @@ def reporte_clientes(request):
     })
 
 
+@login_required
 def reporte_habitaciones(request):
     if not _es_admin(request):
         return redirect('home')
@@ -133,6 +130,10 @@ def exportar_reservas_pdf(request):
     if not _es_admin(request):
         return redirect('home')
     reservas = _filtrar_reservas_request(request)
+    encabezados = [
+        'Código', 'Cliente', 'Email', 'Habitación', 'Tipo',
+        'Creación', 'Entrada', 'Salida', 'Estado', 'Total',
+    ]
     filas = [
         [
             reserva.codigo,
@@ -212,6 +213,14 @@ def _filas_habitaciones(reservas):
 
 
 def _generar_pdf(titulo, encabezados, filas, nombre_archivo):
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import landscape, A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    except ImportError:
+        return HttpResponse('ReportLab no está instalado en este entorno.', status=503)
+
     buffer = BytesIO()
     documento = SimpleDocTemplate(buffer, pagesize=landscape(A4), leftMargin=24, rightMargin=24, topMargin=24, bottomMargin=24)
     estilos = getSampleStyleSheet()

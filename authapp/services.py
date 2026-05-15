@@ -1,13 +1,18 @@
-from django.conf import settings
+import logging
+
 from django.core.mail import send_mail
 from django.urls import reverse
 
 
-def send_verification_email(user, token):
+logger = logging.getLogger(__name__)
+
+
+def send_verification_email(request, user, token):
     """Envía correo de verificación con enlace que contiene el token."""
     try:
         verification_path = reverse('verify_email')
-        verification_url = f"http://127.0.0.1:8000{verification_path}?token={token.token}"
+        verification_url = request.build_absolute_uri(verification_path)
+        verification_url = f"{verification_url}?token={token.token}"
 
         subject = "Verifica tu cuenta"
         message = (
@@ -23,9 +28,9 @@ def send_verification_email(user, token):
         send_mail(
             subject,
             message,
-            settings.DEFAULT_FROM_EMAIL,
+            None,
             [user.email],
         )
     except Exception as e:
-        print(f"Error al enviar correo de verificación: {e}")
+        logger.exception("Error al enviar correo de verificación: %s", e)
         raise

@@ -28,7 +28,7 @@ def register_view(request):
 
                 # Enviar correo de verificación
                 try:
-                    send_verification_email(user, token)
+                    send_verification_email(request, user, token)
                 except Exception:
                     messages.warning(
                         request,
