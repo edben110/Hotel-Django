@@ -582,7 +582,13 @@
         <div class="col-md-6 col-lg-4">
             <div class="room-card-client">
                 {% if habitacion.imagen %}
+                {% if habitacion.tiene_imagen_real %}
                 <img src="{{ habitacion.imagen.url }}" class="w-100" alt="Hab {{ habitacion.numero }}" style="height:170px;object-fit:cover;">
+                {% else %}
+                <div class="w-100 d-flex align-items-center justify-content-center" style="height:170px;background:#f5f0e8;color:#b8860b;">
+                    <i class="bi bi-building" style="font-size:2rem;"></i>
+                </div>
+                {% endif %}
                 {% else %}
                 <div class="d-flex align-items-center justify-content-center" style="height:170px;background:linear-gradient(135deg,#f5f0e8,#ede8df);"><i class="bi bi-building" style="font-size:2rem;color:#b8860b;opacity:.4;"></i></div>
                 {% endif %}
