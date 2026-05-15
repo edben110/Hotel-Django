@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">{{ titulo }}</h1>
+        <p class="text-muted mb-0">{{ total_registros }} registro(s) según los filtros actuales.</p>
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-outline-danger" href="{{ export_pdf_url }}?{{ request.GET.urlencode }}">PDF</a>
+        <a class="btn btn-outline-success" href="{{ export_excel_url }}?{{ request.GET.urlencode }}">Excel</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">{{ form.fecha_inicio.label_tag }}{{ form.fecha_inicio }}</div>
+            <div class="col-md-3">{{ form.fecha_fin.label_tag }}{{ form.fecha_fin }}</div>
+            <div class="col-md-3">{{ form.estado_reserva.label_tag }}{{ form.estado_reserva }}</div>
+            <div class="col-md-3">{{ form.estado_habitacion.label_tag }}{{ form.estado_habitacion }}</div>
+            <div class="col-md-4">{{ form.cliente.label_tag }}{{ form.cliente }}</div>
+            <div class="col-md-4">{{ form.habitacion.label_tag }}{{ form.habitacion }}</div>
+            <div class="col-md-4">{{ form.tipo_habitacion.label_tag }}{{ form.tipo_habitacion }}</div>
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+                <a class="btn btn-outline-secondary" href=".">Limpiar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body table-responsive">
+        {% if modo == 'reservas' %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Habitación</th>
+                        <th>Ingreso</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                        <tr>
+                            <td>{{ reserva.codigo }}</td>
+                            <td>
+                                <div class="fw-semibold">{{ reserva.nombre_cliente }}</div>
+                                <div class="text-muted small">{{ reserva.email_cliente }}</div>
+                            </td>
+                            <td>{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipo.nombre }}</td>
+                            <td>{{ reserva.fecha_entrada }}</td>
+                            <td>{{ reserva.fecha_salida }}</td>
+                            <td><span class="badge text-bg-secondary">{{ reserva.get_estado_display }}</span></td>
+                            <td>${{ reserva.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">No hay reservas para mostrar.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif modo == 'clientes' %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Total reservas</th>
+                        <th>Total gastado</th>
+                        <th>Primera reserva</th>
+                        <th>Última reserva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in filas_clientes %}
+                        <tr>
+                            <td class="fw-semibold">{{ fila.nombre_cliente }}</td>
+                            <td>{{ fila.email_cliente }}</td>
+                            <td>{{ fila.total_reservas }}</td>
+                            <td>${{ fila.total_gastado }}</td>
+                            <td>{{ fila.primera_reserva|default:'-' }}</td>
+                            <td>{{ fila.ultima_reserva|default:'-' }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">No hay clientes para mostrar.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Habitación</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Capacidad</th>
+                        <th>Precio/Noche</th>
+                        <th>Reservas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in filas_habitaciones %}
+                        <tr>
+                            <td class="fw-semibold">{{ fila.habitacion.numero }}</td>
+                            <td>{{ fila.habitacion.tipo.nombre }}</td>
+                            <td>{{ fila.habitacion.get_estado_display }}</td>
+                            <td>{{ fila.habitacion.capacidad }}</td>
+                            <td>${{ fila.habitacion.precio_por_noche }}</td>
+                            <td>{{ fila.total_reservas }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">No hay habitaciones para mostrar.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

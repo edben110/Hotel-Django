@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Habitaciones disponibles{% endblock %}
+
+{% block content %}
+<h1><i class="bi bi-building"></i> Habitaciones disponibles</h1>
+<p class="text-muted">Selecciona una habitación para iniciar tu reserva.</p>
+
+{% if habitaciones %}
+<div class="row">
+    {% for habitacion in habitaciones %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            {% if habitacion.imagen %}
+                <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
+                <p class="card-text mb-1">
+                    <strong>Tipo:</strong> {{ habitacion.tipo.nombre }}<br>
+                    <strong>Capacidad:</strong> {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}<br>
+                    <strong>Precio:</strong> ${{ habitacion.precio_por_noche }}/noche
+                </p>
+                {% if habitacion.descripcion %}
+                <p class="text-muted small">{{ habitacion.descripcion|truncatechars:100 }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success w-100">
+                    <i class="bi bi-cart-plus"></i> Reservar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No hay habitaciones disponibles en este momento.
+</div>
+{% endif %}
+{% endblock %}

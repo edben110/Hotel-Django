@@ -22,4 +22,6 @@ urlpatterns = [
     path('', lambda request: redirect('habitaciones:habitacion_list')),
     path('admin/', admin.site.urls),
     path('habitaciones/', include('habitaciones.urls')),
+    path('reservas/', include('reservas.urls')),
+    path('reportes/', include('reportes.urls')),
 ]
