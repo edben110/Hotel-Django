@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .form-card {
+        background: rgba(255,255,255,.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        max-width: 650px;
+        margin: 0 auto;
+    }
+    .form-card .form-header {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c);
+        border-radius: 1.5rem 1.5rem 0 0;
+        padding: 1.5rem 2rem;
+        color: #fff;
+        border-bottom: 1px solid rgba(184,134,11,.2);
+    }
+    .form-card .form-header h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.4rem; margin:0; }
+    .form-card .form-body { padding: 2rem; }
+    .form-card .form-control, .form-card .form-select {
+        border: 1px solid #e8e0d5;
+        background: #faf8f5;
+        border-radius: .5rem;
+        padding: .7rem 1rem;
+    }
+    .form-card .form-control:focus, .form-card .form-select:focus {
+        border-color: #b8860b;
+        box-shadow: 0 0 0 3px rgba(184,134,11,.1);
+        background: #fff;
+    }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.65rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+</style>
+
+<div class="page-wrapper">
+    <div class="form-card fade-in-up">
+        <div class="form-header">
+            <h1><i class="bi bi-door-open"></i> {{ titulo }}</h1>
+        </div>
+        <div class="form-body">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {% if field.name == "tipo" %}
+                            <div class="input-group">
+                                {{ field }}
+                                <a href="{% url 'habitaciones:tipo_create' %}" class="btn btn-outline-secondary" title="Crear nuevo tipo">
+                                    <i class="bi bi-plus-lg"></i>
+                                </a>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{% for error in field.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                        {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-gold"><i class="bi bi-check-circle"></i> Guardar</button>
+                    <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

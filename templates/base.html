@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Áurea Hotel & Resort{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --hotel-primary: #1d4ed8;
+            --hotel-primary-dark: #1e40af;
+            --hotel-accent: #0ea5e9;
+            --hotel-dark: #0f172a;
+            --hotel-gray: #64748b;
+            --hotel-light: #f8fafc;
+            --hotel-border: #e2e8f0;
+            --hotel-shadow: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 12px rgba(15, 23, 42, .04);
+            --hotel-shadow-lg: 0 4px 6px rgba(15, 23, 42, .05), 0 10px 40px rgba(15, 23, 42, .08);
+            --hotel-radius: 0.75rem;
+            --hotel-radius-lg: 1.25rem;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--hotel-light);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .hotel-navbar {
+            background: #1a1a1a !important;
+            border-bottom: 1px solid rgba(184, 134, 11, .12);
+            padding: .75rem 0;
+            position: relative;
+            z-index: 1030;
+            overflow: visible;
+        }
+
+        .hotel-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -.02em;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .hotel-navbar .navbar-brand .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--hotel-primary), var(--hotel-accent));
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .hotel-navbar .nav-link {
+            color: rgba(255,255,255,.7) !important;
+            font-weight: 500;
+            font-size: .875rem;
+            padding: .5rem .85rem !important;
+            border-radius: .5rem;
+            transition: all .2s ease;
+        }
+
+        .hotel-navbar .nav-link:hover,
+        .hotel-navbar .nav-link:focus {
+            color: #fff !important;
+            background: rgba(184, 134, 11, .12);
+        }
+
+        .hotel-navbar .dropdown-menu {
+            border: 1px solid var(--hotel-border);
+            border-radius: var(--hotel-radius);
+            box-shadow: var(--hotel-shadow-lg);
+            padding: .5rem;
+            margin-top: .5rem;
+            z-index: 1050;
+        }
+
+        .hotel-navbar .dropdown-item {
+            border-radius: .375rem;
+            padding: .5rem .75rem;
+            font-size: .875rem;
+            font-weight: 500;
+        }
+
+        .hotel-navbar .dropdown-item:hover {
+            background: var(--hotel-light);
+        }
+
+        .hotel-navbar .badge {
+            font-size: .65rem;
+            padding: .25em .5em;
+            border-radius: 999px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: 1px solid var(--hotel-border);
+            border-radius: var(--hotel-radius);
+            box-shadow: var(--hotel-shadow);
+            transition: box-shadow .2s ease, transform .2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--hotel-shadow-lg);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid var(--hotel-border);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            font-weight: 500;
+            font-size: .875rem;
+            border-radius: .5rem;
+            padding: .5rem 1rem;
+            transition: all .2s ease;
+        }
+
+        .btn-primary {
+            background: #b8860b;
+            border-color: #b8860b;
+        }
+
+        .btn-primary:hover {
+            background: #9a7209;
+            border-color: #9a7209;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, .3);
+        }
+
+        .btn-lg {
+            padding: .65rem 1.5rem;
+            font-size: .95rem;
+        }
+
+        /* ===== TABLES ===== */
+        .table {
+            font-size: .875rem;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: .75rem;
+            letter-spacing: .05em;
+            color: var(--hotel-gray);
+            border-bottom-width: 1px;
+        }
+
+        .table-dark thead th,
+        .table-dark th {
+            color: #fff;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            font-weight: 500;
+            font-size: .75rem;
+            padding: .35em .65em;
+            border-radius: .375rem;
+        }
+
+        /* ===== FORMS ===== */
+        .form-control, .form-select {
+            border: 1px solid var(--hotel-border);
+            border-radius: .5rem;
+            padding: .6rem .85rem;
+            font-size: .875rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .btn-outline-secondary {
+            border-color: #d4c5a9;
+            color: #666;
+            background: rgba(255,255,255,.9);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-outline-secondary:hover {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            color: #fff;
+        }
+
+        .btn-outline-danger {
+            border-color: #dc2626;
+            color: #dc2626;
+            background: rgba(255,255,255,.9);
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #fff;
+        }
+
+        .btn-outline-warning {
+            border-color: #d97706;
+            color: #d97706;
+            background: rgba(255,255,255,.9);
+        }
+
+        .btn-outline-warning:hover {
+            background: #d97706;
+            border-color: #d97706;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+            border-color: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, .3);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #b8860b;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, .1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: .8rem;
+            color: #475569;
+            margin-bottom: .35rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            border-radius: var(--hotel-radius);
+            border: none;
+            font-size: .875rem;
+            font-weight: 500;
+        }
+
+        /* ===== FOOTER ===== */
+        .hotel-footer {
+            background: #1a1a1a;
+            color: rgba(255,255,255,.6);
+            padding: 2.5rem 0;
+            margin-top: auto;
+            border-top: 1px solid rgba(184, 134, 11, .12);
+        }
+
+        .hotel-footer a {
+            color: rgba(255,255,255,.7);
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .hotel-footer a:hover {
+            color: #fff;
+        }
+
+        .hotel-footer .footer-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp .4s ease forwards;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--hotel-light);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--hotel-border);
+        }
+
+        .page-header h1, .page-header h2 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            color: var(--hotel-dark);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-content {
+                padding-top: 1.25rem;
+                padding-bottom: 2rem;
+            }
+        }
+
+        /* ===== LUXURY NAVBAR (non-authenticated) ===== */
+        .hotel-navbar-luxury {
+            background: #fff !important;
+            border-bottom: 1px solid #f0ebe3;
+            padding: 1rem 0;
+        }
+
+        .hotel-navbar-luxury .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #2c2c2c !important;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .hotel-navbar-luxury .nav-link {
+            color: #6b6b6b !important;
+            font-weight: 500;
+            font-size: .85rem;
+            padding: .5rem 1rem !important;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            transition: color .2s ease;
+        }
+
+        .hotel-navbar-luxury .nav-link:hover {
+            color: #b8860b !important;
+        }
+
+        .hotel-navbar-luxury .btn-luxury {
+            background: #b8860b;
+            color: #fff;
+            border: none;
+            border-radius: .25rem;
+            padding: .5rem 1.25rem;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            transition: all .2s ease;
+        }
+
+        .hotel-navbar-luxury .btn-luxury:hover {
+            background: #9a7209;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* ===== LUXURY FOOTER ===== */
+        .hotel-footer-luxury {
+            background: #b8860b;
+            color: rgba(255,255,255,.85);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .hotel-footer-luxury a {
+            color: rgba(255,255,255,.9);
+            text-decoration: none;
+        }
+
+        .hotel-footer-luxury a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg hotel-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" style="height:36px;width:auto;">
+                    <path d="M30 55 C30 35, 50 20, 50 20 C50 20, 70 35, 70 55" stroke="#b8860b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <line x1="50" y1="20" x2="50" y2="55" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="37" y1="40" x2="63" y2="40" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="28" y1="55" x2="72" y2="55" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+                    <text x="90" y="48" font-family="Georgia, 'Playfair Display', serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="3">ÁUREA</text>
+                    <text x="91" y="64" font-family="'Inter', Arial, sans-serif" font-size="9" fill="#b8860b" letter-spacing="4" font-weight="500">HOTEL &amp; RESORT</text>
+                </svg>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house-door"></i> Inicio
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-door-open"></i> Habitaciones
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'habitaciones:habitacion_list' %}">
+                                    <i class="bi bi-list-ul"></i> Ver habitaciones
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'habitaciones:buscar_disponibilidad' %}">
+                                    <i class="bi bi-search"></i> Buscar disponibilidad
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">
+                            <i class="bi bi-calendar-check"></i> Mis Reservas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reservas:carrito_detail' %}">
+                            <i class="bi bi-cart3"></i> Carrito
+                            {% if carrito_count %}
+                                <span class="badge bg-warning text-dark">{{ carrito_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    {% if user.role == 'admin' %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i> Administración
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'reportes:dashboard' %}">
+                                    <i class="bi bi-speedometer2"></i> Dashboard / Reportes
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'habitaciones:habitacion_create' %}">
+                                    <i class="bi bi-plus-circle"></i> Crear habitación
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'habitaciones:tipo_list' %}">
+                                    <i class="bi bi-tags"></i> Tipos de habitación
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <span class="dropdown-item-text">
+                                    <span class="badge bg-{% if user.role == 'admin' %}primary{% else %}success{% endif %}">
+                                        {{ user.get_role_display }}
+                                    </span>
+                                </span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% else %}
+    <nav class="navbar navbar-expand-lg hotel-navbar-luxury">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'login' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" style="height:38px;width:auto;">
+                    <path d="M30 55 C30 35, 50 20, 50 20 C50 20, 70 35, 70 55" stroke="#b8860b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <line x1="50" y1="20" x2="50" y2="55" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="37" y1="40" x2="63" y2="40" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="28" y1="55" x2="72" y2="55" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+                    <text x="90" y="48" font-family="Georgia, 'Playfair Display', serif" font-size="32" font-weight="700" fill="#2c2c2c" letter-spacing="3">ÁUREA</text>
+                    <text x="91" y="64" font-family="'Inter', Arial, sans-serif" font-size="9" fill="#b8860b" letter-spacing="4" font-weight="500">HOTEL &amp; RESORT</text>
+                </svg>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Habitaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Contacto</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-luxury" href="{% url 'login' %}">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-luxury" href="{% url 'register' %}" style="background:transparent;color:#b8860b;border:1px solid #b8860b;">Registro</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Contenido principal -->
+    <div class="{% if user.is_authenticated %}container main-content{% else %}main-content{% endif %}" {% if not user.is_authenticated %}style="padding-top:0; padding-bottom:0;"{% endif %}>
+        {% if messages %}
+        <div class="{% if not user.is_authenticated %}container mt-3{% endif %}">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in-up" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    {% if user.is_authenticated %}
+    <footer class="hotel-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="footer-brand">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" style="height:30px;width:auto;">
+                            <path d="M30 55 C30 35, 50 20, 50 20 C50 20, 70 35, 70 55" stroke="#b8860b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                            <line x1="50" y1="20" x2="50" y2="55" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="37" y1="40" x2="63" y2="40" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="28" y1="55" x2="72" y2="55" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+                            <text x="90" y="48" font-family="Georgia, 'Playfair Display', serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="3">ÁUREA</text>
+                            <text x="91" y="64" font-family="'Inter', Arial, sans-serif" font-size="9" fill="#b8860b" letter-spacing="4" font-weight="500">HOTEL &amp; RESORT</text>
+                        </svg>
+                    </div>
+                    <p class="small mb-0 mt-1">Tu destino de confort y elegancia.</p>
+                </div>
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="small">Habitaciones</a>
+                        <a href="{% url 'reservas:buscar_reserva' %}" class="small">Consultar reserva</a>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="small mb-0">&copy; 2025 Áurea Hotel & Resort. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% else %}
+    <footer class="hotel-footer-luxury">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <p class="small mb-0" style="font-family:'Playfair Display',serif; font-weight:600; letter-spacing:.03em;">
+                    Áurea Hotel & Resort
+                </p>
+                <p class="small mb-0">
+                    <a href="{% url 'login' %}">Inicio</a>
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'login' %}">Habitaciones</a>
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'login' %}">Contacto</a>
+                </p>
+                <p class="small mb-0">&copy; 2025 Áurea Hotel & Resort. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

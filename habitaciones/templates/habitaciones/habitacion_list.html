@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Habitaciones - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .page-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 240, 235, .65);
+    }
+    .page-wrapper > * { position: relative; z-index: 1; }
+    @media(min-width:992px) {
+        .page-wrapper { margin: -2rem calc(-1*(50vw - 570px)) -3rem; padding: 3rem calc(50vw - 570px) 5rem; }
+    }
+
+    /* Header */
+    .page-header-card {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        border-radius: 1.5rem;
+        padding: 2rem 2.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15);
+        position: relative;
+        overflow: hidden;
+    }
+    .page-header-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(184,134,11,.08) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .page-header-card h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: .25rem;
+    }
+    .page-header-card p {
+        opacity: .6;
+        margin-bottom: 0;
+        font-size: .88rem;
+    }
+    .page-header-card .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: rgba(184,134,11,.1);
+        border: 1px solid rgba(184,134,11,.2);
+        border-radius: 2rem;
+        padding: .3rem .75rem;
+        font-size: .65rem;
+        font-weight: 700;
+        color: #b8860b;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        margin-bottom: .75rem;
+    }
+    .btn-gold-header {
+        background: #b8860b;
+        color: #fff;
+        border: none;
+        border-radius: .5rem;
+        padding: .6rem 1.25rem;
+        font-size: .82rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .btn-gold-header:hover {
+        background: #9a7209;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(184,134,11,.3);
+    }
+
+    /* Room cards */
+    .room-card {
+        background: rgba(255,255,255,.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+        overflow: hidden;
+        transition: all .25s ease;
+    }
+    .room-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.04);
+    }
+    .room-card .room-img {
+        height: 160px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .room-card .room-img-placeholder {
+        height: 160px;
+        background: linear-gradient(135deg, #f5f0e8, #ede8df);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .room-card .room-img-placeholder i {
+        font-size: 2.2rem;
+        color: #b8860b;
+        opacity: .3;
+    }
+    .room-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+    .room-card .room-number {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+    }
+    .room-card .room-type {
+        font-size: .78rem;
+        color: #999;
+        font-weight: 500;
+    }
+    .room-card .room-price {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #b8860b;
+    }
+    .room-card .room-price small {
+        font-weight: 400;
+        font-size: .7rem;
+        color: #999;
+        font-family: 'Inter', sans-serif;
+    }
+    .room-card .room-meta {
+        display: flex;
+        gap: .75rem;
+        margin-top: .5rem;
+        font-size: .75rem;
+        color: #999;
+    }
+    .room-card .room-meta span {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+    .room-card .badge {
+        font-size: .68rem;
+        padding: .3rem .6rem;
+        border-radius: 2rem;
+        font-weight: 600;
+    }
+    .room-card .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: .5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8rem;
+        border: 1px solid #e8e0d5;
+        background: #fff;
+        color: #666;
+        transition: all .15s ease;
+        text-decoration: none;
+    }
+    .room-card .action-btn:hover {
+        border-color: #b8860b;
+        color: #b8860b;
+        background: rgba(184,134,11,.05);
+    }
+    .room-card .action-btn.primary {
+        background: #b8860b;
+        border-color: #b8860b;
+        color: #fff;
+    }
+    .room-card .action-btn.primary:hover {
+        background: #9a7209;
+        border-color: #9a7209;
+    }
+    .room-card .action-btn.danger:hover {
+        border-color: #dc2626;
+        color: #dc2626;
+        background: rgba(220,38,38,.05);
+    }
+    .room-card .action-btn.warning:hover {
+        border-color: #d97706;
+        color: #d97706;
+        background: rgba(217,119,6,.05);
+    }
+
+    /* Empty state */
+    .empty-state-card {
+        background: rgba(255,255,255,.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .empty-state-card i { color: #b8860b; opacity: .4; }
+</style>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <div class="page-header-card fade-in-up">
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index:1;">
+            <div>
+                <span class="header-badge"><i class="bi bi-door-open"></i> Gestión</span>
+                <h1>Habitaciones</h1>
+                <p>Explora y administra todas las habitaciones de Áurea</p>
+            </div>
+            {% if request.user.role == 'admin' %}
+            <a href="{% url 'habitaciones:habitacion_create' %}" class="btn-gold-header">
+                <i class="bi bi-plus-circle"></i> Nueva Habitación
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Room grid -->
+    {% if habitaciones %}
+    <div class="row g-4 fade-in-up">
+        {% for habitacion in habitaciones %}
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card room-card h-100">
+                {% if habitacion.imagen %}
+                <img src="{{ habitacion.imagen.url }}" class="room-img" alt="Habitación {{ habitacion.numero }}">
+                {% else %}
+                <div class="room-img-placeholder">
+                    <i class="bi bi-building"></i>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div>
+                            <div class="room-number">Hab. {{ habitacion.numero }}</div>
+                            <div class="room-type">{{ habitacion.tipo.nombre }}</div>
+                        </div>
+                        <span class="badge bg-{% if habitacion.estado == 'disponible' %}success{% elif habitacion.estado == 'ocupada' %}danger{% else %}warning{% endif %}">
+                            {{ habitacion.get_estado_display }}
+                        </span>
+                    </div>
+
+                    <div class="room-meta">
+                        <span><i class="bi bi-people-fill"></i> {{ habitacion.capacidad }}</span>
+                    </div>
+
+                    <div class="mt-auto pt-3 d-flex justify-content-between align-items-center">
+                        <div class="room-price">
+                            ${{ habitacion.precio_por_noche }} <small>/ noche</small>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="action-btn" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
+                            <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="action-btn primary" title="Reservar">
+                                <i class="bi bi-cart-plus"></i>
+                            </a>
+                            {% endif %}
+                            {% if request.user.role == 'admin' %}
+                            <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="action-btn warning" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'habitaciones:habitacion_delete' habitacion.pk %}" class="action-btn danger" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-card fade-in-up">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" fill="none" style="width:180px; height:auto; margin-bottom:1.5rem;">
+            <!-- Puerta -->
+            <rect x="65" y="30" width="70" height="110" rx="6" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.04)"/>
+            <!-- Arco superior -->
+            <path d="M65 60 C65 40, 100 25, 100 25 C100 25, 135 40, 135 60" stroke="#b8860b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Manija -->
+            <circle cx="120" cy="90" r="4" stroke="#b8860b" stroke-width="1.5" fill="rgba(184,134,11,.1)"/>
+            <!-- Piso -->
+            <line x1="40" y1="140" x2="160" y2="140" stroke="#e8e0d5" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Estrellas -->
+            <circle cx="45" cy="40" r="2" fill="#b8860b" opacity=".3"/>
+            <circle cx="155" cy="35" r="2.5" fill="#b8860b" opacity=".2"/>
+            <circle cx="50" cy="60" r="1.5" fill="#b8860b" opacity=".25"/>
+        </svg>
+        <h4 class="fw-semibold" style="color:#1a1a1a; font-family:'Playfair Display',serif;">No hay habitaciones registradas</h4>
+        <p style="color:#999; max-width:320px; margin:0 auto 1.5rem;">Comienza agregando la primera habitación al sistema.</p>
+        {% if request.user.role == 'admin' %}
+        <a href="{% url 'habitaciones:habitacion_create' %}" class="btn-gold-header"><i class="bi bi-plus-circle"></i> Crear habitación</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

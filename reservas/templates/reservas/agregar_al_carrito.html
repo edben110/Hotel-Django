@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Reservar habitación {{ habitacion.numero }} - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .booking-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; max-width:650px; margin:0 auto; }
+    .booking-header { background:linear-gradient(145deg,#1a1a1a,#2c2c2c); padding:1.75rem 2rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }
+    .booking-header h2 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.3rem; margin-bottom:.25rem; }
+    .booking-header p { opacity:.6; font-size:.85rem; margin-bottom:0; }
+    .booking-body { padding:2rem; }
+    .room-summary { background:rgba(184,134,11,.04); border:1px solid rgba(184,134,11,.1); border-radius:1rem; padding:1rem 1.25rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; }
+    .room-summary .room-icon { width:48px; height:48px; background:#b8860b; border-radius:.75rem; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.2rem; flex-shrink:0; }
+    .room-summary .room-info strong { display:block; font-size:.95rem; color:#1a1a1a; }
+    .room-summary .room-info span { font-size:.8rem; color:#999; }
+    .booking-card .form-control, .booking-card .form-select { border:1px solid #e8e0d5; background:#faf8f5; border-radius:.5rem; padding:.7rem 1rem; }
+    .booking-card .form-control:focus, .booking-card .form-select:focus { border-color:#b8860b; box-shadow:0 0 0 3px rgba(184,134,11,.1); background:#fff; }
+    .booking-card .form-label i { color:#b8860b; }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.7rem 1.25rem; font-weight:600; font-size:.9rem; transition:all .2s; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+</style>
+
+<div class="page-wrapper">
+    <div class="booking-card fade-in-up">
+        <div class="booking-header">
+            <h2><i class="bi bi-cart-plus"></i> Reservar habitación {{ habitacion.numero }}</h2>
+            <p>Selecciona las fechas y cantidad de huéspedes</p>
+        </div>
+        <div class="booking-body">
+            <div class="room-summary">
+                <div class="room-icon"><i class="bi bi-door-open"></i></div>
+                <div class="room-info">
+                    <strong>{{ habitacion.tipo.nombre }} — Hab. {{ habitacion.numero }}</strong>
+                    <span>${{ habitacion.precio_por_noche }}/noche · Capacidad {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</span>
+                </div>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" style="border-radius:.75rem;">{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+                {% endif %}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label"><i class="bi bi-calendar-event"></i> Fecha de entrada</label>
+                        {{ form.fecha_entrada }}
+                        {% for error in form.fecha_entrada.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form.fecha_salida.id_for_label }}" class="form-label"><i class="bi bi-calendar-event"></i> Fecha de salida</label>
+                        {{ form.fecha_salida }}
+                        {% for error in form.fecha_salida.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form.huespedes.id_for_label }}" class="form-label"><i class="bi bi-people"></i> Huéspedes</label>
+                        {{ form.huespedes }}
+                        {% for error in form.huespedes.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-gold"><i class="bi bi-cart-plus"></i> Agregar al carrito</button>
+                    <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-outline-secondary" style="border-radius:.5rem;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

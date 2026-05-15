@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Reserva confirmada{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+    <h1 class="mt-2">¡Pago aprobado!</h1>
+    <p class="text-muted">Procesado por <strong>{{ gateway_name }}</strong></p>
+</div>
+
+<div class="card border-success mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Detalle del pago</h5>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Pasarela</dt>
+            <dd class="col-sm-8">{{ gateway_name }}</dd>
+            <dt class="col-sm-4">Código de autorización</dt>
+            <dd class="col-sm-8"><code>{{ resultado.codigo_autorizacion }}</code></dd>
+            <dt class="col-sm-4">Referencia</dt>
+            <dd class="col-sm-8"><code>{{ resultado.referencia }}</code></dd>
+            <dt class="col-sm-4">Tarjeta</dt>
+            <dd class="col-sm-8">{{ resultado.marca|capfirst }} **** {{ resultado.ultimos_4 }}</dd>
+        </dl>
+    </div>
+</div>
+
+<h4>Tus reservas</h4>
+{% for reserva in reservas %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5>Habitación {{ reserva.habitacion.numero }} ·
+                    <span class="text-muted">{{ reserva.habitacion.tipo.nombre }}</span>
+                </h5>
+                <p class="mb-1">
+                    <strong>Código:</strong> <code class="fs-5">{{ reserva.codigo }}</code>
+                </p>
+                <p class="mb-1"><strong>Cliente:</strong> {{ reserva.nombre_cliente }} ({{ reserva.email_cliente }})</p>
+                <p class="mb-0">
+                    <strong>Fechas:</strong>
+                    {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}
+                    ({{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }})
+                </p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-success fs-6">{{ reserva.get_estado_display }}</span>
+                <h3 class="mt-2 mb-0">${{ reserva.total }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn btn-outline-primary">
+            Ver detalle
+        </a>
+    </div>
+</div>
+{% endfor %}
+
+<div class="text-center mt-4">
+    <a href="{% url 'reservas:habitaciones_disponibles' %}" class="btn btn-link">Volver al inicio</a>
+</div>
+{% endblock %}

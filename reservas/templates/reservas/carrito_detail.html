@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Tu carrito - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card { background:linear-gradient(145deg,#1a1a1a,#2c2c2c,#1f1a14); border-radius:1.5rem; padding:2rem 2.5rem; color:#fff; margin-bottom:2rem; border:1px solid rgba(184,134,11,.25); box-shadow:0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden; }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+
+    .table-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; }
+    .table-card .table { margin-bottom:0; }
+    .table-card .table thead th { background:#1a1a1a; color:#fff; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; font-weight:600; padding:.85rem 1rem; border:none; }
+    .table-card .table tbody td { padding:1rem; vertical-align:middle; border-color:rgba(184,134,11,.06); }
+    .table-card .cart-total-row { background:rgba(184,134,11,.04); }
+    .table-card .cart-total-row td { padding:1.25rem 1rem !important; }
+
+    .actions-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:1.25rem 1.5rem; margin-top:1.5rem; }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.65rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+    .btn-outline-gold { background:transparent; color:#b8860b; border:1px solid #b8860b; border-radius:.5rem; padding:.65rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-outline-gold:hover { background:#b8860b; color:#fff; }
+
+    .empty-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:4rem 2rem; text-align:center; }
+    .empty-card i { color:#b8860b; opacity:.4; }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="position-relative" style="z-index:1;">
+            <h1><i class="bi bi-cart3"></i> Tu carrito de reservas</h1>
+            <p>Revisa las habitaciones seleccionadas antes de proceder al pago</p>
+        </div>
+    </div>
+
+    {% if avisos %}
+    <div class="alert alert-warning alert-dismissible fade show fade-in-up" role="alert" style="border-radius:1rem;">
+        <strong><i class="bi bi-exclamation-triangle"></i> Hay problemas con tu reserva:</strong>
+        <ul class="mb-0 mt-2">{% for item, mensaje in avisos %}<li>Habitación {{ item.habitacion.numero }}: {{ mensaje }}</li>{% endfor %}</ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endif %}
+
+    {% if items %}
+    <div class="table-card fade-in-up">
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th style="width:70px;"></th><th>Habitación</th><th>Entrada</th><th>Salida</th><th class="text-center">Noches</th><th class="text-center">Huéspedes</th><th class="text-end">Precio/Noche</th><th class="text-end">Subtotal</th><th style="width:60px;"></th></tr></thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{% if item.habitacion.imagen %}<img src="{{ item.habitacion.imagen.url }}" class="rounded" style="width:55px;height:42px;object-fit:cover;">{% else %}<div class="rounded d-flex align-items-center justify-content-center" style="width:55px;height:42px;background:#f5f0e8;"><i class="bi bi-building" style="color:#b8860b;opacity:.4;"></i></div>{% endif %}</td>
+                        <td><strong class="d-block">{{ item.habitacion.numero }}</strong><small style="color:#999;">{{ item.habitacion.tipo.nombre }}</small></td>
+                        <td>{{ item.fecha_entrada|date:"d/m/Y" }}</td>
+                        <td>{{ item.fecha_salida|date:"d/m/Y" }}</td>
+                        <td class="text-center">{{ item.noches }}</td>
+                        <td class="text-center">{{ item.huespedes }}</td>
+                        <td class="text-end">${{ item.precio_por_noche }}</td>
+                        <td class="text-end fw-bold" style="color:#b8860b;">${{ item.subtotal }}</td>
+                        <td class="text-center"><form method="post" action="{% url 'reservas:carrito_quitar' item.habitacion.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius:.5rem;" title="Quitar"><i class="bi bi-trash"></i></button></form></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot><tr class="cart-total-row"><td colspan="7" class="text-end fw-bold fs-5">Total:</td><td class="text-end fw-bold fs-5" style="color:#b8860b;">${{ total }}</td><td></td></tr></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="actions-card d-flex flex-wrap gap-2 justify-content-between align-items-center fade-in-up">
+        <div class="d-flex gap-2">
+            {% if not avisos %}<a href="{% url 'reservas:checkout' %}" class="btn-gold"><i class="bi bi-credit-card"></i> Proceder al pago</a>{% endif %}
+            <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn-outline-gold"><i class="bi bi-search"></i> Seguir reservando</a>
+        </div>
+        <form method="post" action="{% url 'reservas:carrito_vaciar' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary" style="border-radius:.5rem;"><i class="bi bi-x-circle"></i> Vaciar carrito</button></form>
+    </div>
+
+    {% else %}
+    <div class="empty-card fade-in-up">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" fill="none" style="width:160px; height:auto; margin-bottom:1.5rem;">
+            <!-- Cama de hotel -->
+            <rect x="35" y="90" width="130" height="45" rx="8" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.04)"/>
+            <!-- Cabecera -->
+            <rect x="35" y="65" width="130" height="30" rx="6" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.06)"/>
+            <!-- Almohadas -->
+            <rect x="50" y="72" width="35" height="18" rx="9" stroke="#b8860b" stroke-width="1.5" fill="rgba(184,134,11,.08)"/>
+            <rect x="115" y="72" width="35" height="18" rx="9" stroke="#b8860b" stroke-width="1.5" fill="rgba(184,134,11,.08)"/>
+            <!-- Sábana doblada -->
+            <path d="M45 105 Q100 95 155 105" stroke="#b8860b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Patas -->
+            <line x1="50" y1="135" x2="50" y2="148" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="150" y1="135" x2="150" y2="148" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Zzz (dormido/vacío) -->
+            <text x="155" y="55" font-family="'Playfair Display',serif" font-size="16" fill="#b8860b" opacity=".4" font-weight="600">z</text>
+            <text x="165" y="42" font-family="'Playfair Display',serif" font-size="12" fill="#b8860b" opacity=".3" font-weight="600">z</text>
+            <text x="172" y="32" font-family="'Playfair Display',serif" font-size="9" fill="#b8860b" opacity=".2" font-weight="600">z</text>
+            <!-- Piso -->
+            <line x1="25" y1="150" x2="175" y2="150" stroke="#e8e0d5" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h4 class="fw-semibold" style="font-family:'Playfair Display',serif; color:#1a1a1a;">Tu carrito está vacío</h4>
+        <p style="color:#999; max-width:320px; margin:0 auto 1.5rem;">Explora nuestras habitaciones y comienza a planificar tu estadía en Áurea.</p>
+        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn-gold"><i class="bi bi-search"></i> Ver habitaciones disponibles</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

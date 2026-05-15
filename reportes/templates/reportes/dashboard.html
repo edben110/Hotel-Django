@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Administrativo - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem; padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px); position: relative;
+    }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        border-radius: 1.5rem; padding: 2rem 2.5rem; color: #fff;
+        margin-bottom: 2rem; border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden;
+    }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+    .page-header-card .header-badge { display:inline-flex; align-items:center; gap:.4rem; background:rgba(184,134,11,.1); border:1px solid rgba(184,134,11,.2); border-radius:2rem; padding:.3rem .75rem; font-size:.65rem; font-weight:700; color:#b8860b; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.75rem; }
+    .btn-gold-header { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.6rem 1.25rem; font-size:.82rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s; }
+    .btn-gold-header:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+    .btn-gold-outline { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.25); border-radius:.5rem; padding:.6rem 1.25rem; font-size:.82rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s; }
+    .btn-gold-outline:hover { border-color:#b8860b; color:#b8860b; }
+
+    .glass-card {
+        background: rgba(255,255,255,.95); backdrop-filter:blur(12px);
+        border:1px solid rgba(255,255,255,.8); border-radius:1.5rem;
+        box-shadow:0 4px 24px rgba(0,0,0,.06); padding:1.5rem;
+    }
+    .stat-label { font-size:.7rem; color:#999; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+    .metric-value { font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#1a1a1a; }
+
+    .activity-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); height:100%; overflow:hidden; }
+    .activity-card .card-header-custom { padding:1rem 1.5rem; border-bottom:1px solid rgba(184,134,11,.08); display:flex; align-items:center; gap:.6rem; }
+    .activity-card .header-icon { width:32px; height:32px; background:rgba(184,134,11,.08); border-radius:.5rem; display:flex; align-items:center; justify-content:center; color:#b8860b; font-size:.9rem; }
+    .activity-card .card-header-custom h5 { font-family:'Playfair Display',serif; font-weight:600; font-size:.95rem; color:#1a1a1a; margin:0; }
+    .activity-card .activity-item { padding:.8rem 1.5rem; border-bottom:1px solid rgba(184,134,11,.05); display:flex; justify-content:space-between; align-items:center; }
+    .activity-card .activity-item:last-child { border-bottom:none; }
+    .activity-card .act-name { font-size:.85rem; font-weight:600; color:#2c2c2c; }
+    .activity-card .act-sub { font-size:.73rem; color:#999; }
+    .activity-card .act-date { font-size:.7rem; color:#b8860b; background:rgba(184,134,11,.06); padding:.2rem .5rem; border-radius:.25rem; font-weight:500; }
+    .activity-card .empty-state { padding:2rem 1.5rem; text-align:center; color:#bbb; font-size:.85rem; }
+
+    .chart-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; }
+    .chart-card .chart-header { padding:1rem 1.5rem; border-bottom:1px solid rgba(184,134,11,.08); }
+    .chart-card .chart-header h5 { font-family:'Playfair Display',serif; font-weight:600; font-size:.92rem; color:#1a1a1a; margin:0; }
+    .chart-card .chart-body { padding:1.25rem; }
+
+    .section-title { font-family:'Playfair Display',serif; font-weight:600; font-size:1.1rem; color:#1a1a1a; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+    .section-title::after { content:''; flex:1; height:1px; background:rgba(184,134,11,.15); margin-left:.75rem; }
+    .section-title i { color:#b8860b; }
+</style>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <div class="page-header-card fade-in-up">
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index:1;">
+            <div>
+                <span class="header-badge"><i class="bi bi-speedometer2"></i> Dashboard</span>
+                <h1>Reservas, ocupación y reportes</h1>
+                <p>Datos reales desde la base de habitaciones y reservas de Áurea</p>
+            </div>
+            <div class="d-none d-md-flex gap-2">
+                <a class="btn-gold-header" href="{% url 'reportes:reporte_reservas' %}"><i class="bi bi-file-earmark-bar-graph"></i> Ver reportes</a>
+                <a class="btn-gold-outline" href="{% url 'reportes:reporte_clientes' %}"><i class="bi bi-people"></i> Clientes</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="row g-3 mb-4 fade-in-up">
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Clientes</div><div class="metric-value">{{ metricas.total_clientes }}</div></div></div>
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Habitaciones</div><div class="metric-value">{{ metricas.total_habitaciones }}</div></div></div>
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Reservas</div><div class="metric-value">{{ metricas.total_reservas }}</div></div></div>
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Activas</div><div class="metric-value" style="color:#b8860b;">{{ metricas.reservas_activas }}</div></div></div>
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Disponibles</div><div class="metric-value" style="color:#16a34a;">{{ metricas.habitaciones_disponibles }}</div></div></div>
+        <div class="col-md-6 col-xl-2"><div class="glass-card h-100"><div class="stat-label">Ocupación</div><div class="metric-value" style="color:#b8860b;">{{ metricas.tasa_ocupacion_general }}%</div></div></div>
+    </div>
+
+    <!-- Actividad -->
+    <h4 class="section-title fade-in-up"><i class="bi bi-activity"></i> Actividad reciente</h4>
+    <div class="row g-4 mb-4 fade-in-up">
+        <div class="col-lg-4">
+            <div class="activity-card">
+                <div class="card-header-custom"><div class="header-icon"><i class="bi bi-clock-history"></i></div><h5>Últimas reservas</h5></div>
+                {% for reserva in actividad.reservas_recientes %}
+                <div class="activity-item"><div><div class="act-name">{{ reserva.nombre_cliente }}</div><div class="act-sub">Hab. {{ reserva.habitacion.numero }} · {{ reserva.get_estado_display }}</div></div><div class="act-date">{{ reserva.fecha_creacion|date:'d/m/Y' }}</div></div>
+                {% empty %}<div class="empty-state"><i class="bi bi-inbox"></i> Sin reservas recientes</div>{% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="activity-card">
+                <div class="card-header-custom"><div class="header-icon"><i class="bi bi-people"></i></div><h5>Últimos clientes</h5></div>
+                {% for cliente in actividad.clientes_recientes %}
+                <div class="activity-item"><div><div class="act-name">{{ cliente.nombre_cliente }}</div><div class="act-sub">{{ cliente.email_cliente }}</div></div></div>
+                {% empty %}<div class="empty-state"><i class="bi bi-person-x"></i> Sin clientes recientes</div>{% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="activity-card">
+                <div class="card-header-custom"><div class="header-icon"><i class="bi bi-arrow-repeat"></i></div><h5>Cambios recientes</h5></div>
+                {% for habitacion in actividad.cambios_recientes %}
+                <div class="activity-item"><div><div class="act-name">Habitación {{ habitacion.numero }}</div><div class="act-sub">{{ habitacion.fecha_actualizacion|date:'d/m/Y H:i' }}</div></div></div>
+                {% empty %}<div class="empty-state"><i class="bi bi-journal-x"></i> Sin cambios recientes</div>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <h4 class="section-title fade-in-up"><i class="bi bi-bar-chart"></i> Estadísticas</h4>
+    <div class="row g-4 fade-in-up">
+        <div class="col-lg-6"><div class="chart-card"><div class="chart-header"><h5>Reservas por mes</h5></div><div class="chart-body"><canvas id="chartReservasMes" height="140"></canvas></div></div></div>
+        <div class="col-lg-6"><div class="chart-card"><div class="chart-header"><h5>Ocupación por mes</h5></div><div class="chart-body"><canvas id="chartOcupacionMes" height="140"></canvas></div></div></div>
+        <div class="col-lg-4"><div class="chart-card"><div class="chart-header"><h5>Habitación más reservada</h5></div><div class="chart-body"><canvas id="chartHabitaciones" height="220"></canvas></div></div></div>
+        <div class="col-lg-4"><div class="chart-card"><div class="chart-header"><h5>Estado de reservas</h5></div><div class="chart-body"><canvas id="chartEstados" height="220"></canvas></div></div></div>
+        <div class="col-lg-4"><div class="chart-card"><div class="chart-header"><h5>Clientes con más reservas</h5></div><div class="chart-body"><canvas id="chartClientes" height="220"></canvas></div></div></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const dashboardDataUrl = "{{ dashboard_data_url }}";
+    const buildChart = (id, cfg) => { const c = document.getElementById(id); if(c) new Chart(c, cfg); };
+    fetch(dashboardDataUrl).then(r => r.json()).then(data => {
+        buildChart('chartReservasMes', {type:'line',data:{labels:data.reservas_por_mes.labels,datasets:[{label:'Reservas',data:data.reservas_por_mes.values,borderColor:'#b8860b',backgroundColor:'rgba(184,134,11,.08)',tension:.4,fill:true,pointBackgroundColor:'#b8860b',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f5f0e8'}},x:{grid:{display:false}}}}});
+        buildChart('chartOcupacionMes', {type:'bar',data:{labels:data.ocupacion_por_mes.labels,datasets:[{label:'%',data:data.ocupacion_por_mes.values,backgroundColor:'#b8860b',borderRadius:8,barThickness:20}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'#f5f0e8'}},x:{grid:{display:false}}}}});
+        buildChart('chartHabitaciones', {type:'doughnut',data:{labels:data.habitaciones_mas_reservadas.labels,datasets:[{data:data.habitaciones_mas_reservadas.values,backgroundColor:['#b8860b','#d4a84b','#8b6914','#2c2c2c','#999'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+        buildChart('chartEstados', {type:'doughnut',data:{labels:data.estado_reservas.labels,datasets:[{data:data.estado_reservas.values,backgroundColor:['#d4a84b','#b8860b','#dc2626','#16a34a'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+        buildChart('chartClientes', {type:'bar',data:{labels:data.clientes_mas_reservas.labels,datasets:[{label:'Reservas',data:data.clientes_mas_reservas.values,backgroundColor:'#2c2c2c',borderRadius:8,barThickness:16}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f5f0e8'}},y:{grid:{display:false}}}}});
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Tipos de Habitación - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        border-radius: 1.5rem; padding: 2rem 2.5rem; color: #fff;
+        margin-bottom: 2rem; border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden;
+    }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+    .btn-gold-header { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.6rem 1.25rem; font-size:.82rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s; }
+    .btn-gold-header:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+
+    .table-card {
+        background: rgba(255,255,255,.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        overflow: hidden;
+    }
+    .table-card .table { margin-bottom:0; }
+    .table-card .table thead th {
+        background: #faf8f5; border-bottom:1px solid rgba(184,134,11,.08);
+        font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#999; font-weight:600; padding:.85rem 1.25rem;
+    }
+    .table-card .table tbody td { padding:.85rem 1.25rem; vertical-align:middle; border-color:rgba(184,134,11,.06); }
+    .action-btn {
+        width:32px; height:32px; border-radius:.5rem; display:inline-flex; align-items:center; justify-content:center;
+        font-size:.8rem; border:1px solid #e8e0d5; background:#fff; color:#666; transition:all .15s; text-decoration:none;
+    }
+    .action-btn:hover { border-color:#b8860b; color:#b8860b; background:rgba(184,134,11,.05); }
+    .action-btn.danger:hover { border-color:#dc2626; color:#dc2626; background:rgba(220,38,38,.05); }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index:1;">
+            <div>
+                <h1><i class="bi bi-tags"></i> Tipos de Habitación</h1>
+                <p>Gestiona las categorías de habitaciones</p>
+            </div>
+            {% if request.user.role == 'admin' %}
+            <a href="{% url 'habitaciones:tipo_create' %}" class="btn-gold-header"><i class="bi bi-plus-circle"></i> Nuevo Tipo</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="table-card fade-in-up">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead><tr><th>Nombre</th><th>Descripción</th><th>Habitaciones</th><th>Acciones</th></tr></thead>
+                <tbody>
+                    {% for tipo in tipos %}
+                    <tr>
+                        <td class="fw-semibold">{{ tipo.nombre }}</td>
+                        <td style="color:#666; font-size:.85rem;">{{ tipo.descripcion|truncatewords:15 }}</td>
+                        <td><span class="badge" style="background:rgba(184,134,11,.08); color:#b8860b; font-weight:600;">{{ tipo.habitaciones.count }}</span></td>
+                        <td>
+                            {% if request.user.role == 'admin' %}
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'habitaciones:tipo_update' tipo.pk %}" class="action-btn" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'habitaciones:tipo_delete' tipo.pk %}" class="action-btn danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center py-4" style="color:#999;">No hay tipos de habitación registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

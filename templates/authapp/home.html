@@ -1,0 +1,647 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Áurea Hotel & Resort{% endblock %}
+
+{% block content %}
+{% if user.role == 'admin' %}
+<style>
+    .admin-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2.5rem 2rem 4rem;
+        border-radius: 0;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .admin-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 240, 235, .65);
+    }
+    .admin-wrapper > * {
+        position: relative;
+        z-index: 1;
+    }
+    @media(min-width:992px) {
+        .admin-wrapper { margin: -2rem calc(-1*(50vw - 570px)) -3rem; padding: 3rem calc(50vw - 570px) 5rem; }
+    }
+
+    /* Welcome header */
+    .admin-welcome {
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(184,134,11,.1);
+    }
+    .admin-welcome .welcome-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .admin-welcome h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 2.4rem;
+        color: #1a1a1a;
+        margin-bottom: .25rem;
+    }
+    .admin-welcome p {
+        color: #7a7a7a;
+        font-size: .9rem;
+    }
+    .admin-welcome .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: rgba(184,134,11,.08);
+        border: 1px solid rgba(184,134,11,.15);
+        border-radius: 2rem;
+        padding: .4rem 1rem;
+        font-size: .72rem;
+        font-weight: 600;
+        color: #b8860b;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+    .admin-welcome .welcome-date {
+        font-size: .8rem;
+        color: #999;
+        margin-top: .25rem;
+    }
+
+    /* Top metrics row */
+    .top-metrics {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        padding: 1.75rem 2rem;
+        background: rgba(255, 255, 255, .95);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, .8);
+        box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    }
+    .top-metric {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex: 1;
+        min-width: 140px;
+    }
+    .top-metric .metric-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        line-height: 1;
+    }
+    .top-metric .metric-label {
+        font-size: .72rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 500;
+    }
+    .top-metric .metric-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: .75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .top-metric .metric-icon.gold { background: rgba(184,134,11,.1); color: #b8860b; }
+    .top-metric .metric-icon.green { background: rgba(22,163,74,.1); color: #16a34a; }
+    .top-metric .metric-icon.red { background: rgba(220,38,38,.1); color: #dc2626; }
+
+    /* Bento grid */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+    }
+    @media(max-width:991px) { .bento-grid { grid-template-columns: 1fr; } }
+
+    /* Bento card base */
+    .bento-card {
+        background: rgba(255, 255, 255, .95);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, .8);
+        box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+        padding: 1.75rem;
+        transition: box-shadow .25s ease, transform .25s ease;
+    }
+    .bento-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.04);
+        transform: translateY(-3px);
+    }
+
+    /* Card sizes */
+    .bento-span-4 { grid-column: span 4; }
+    .bento-span-5 { grid-column: span 5; }
+    .bento-span-6 { grid-column: span 6; }
+    .bento-span-7 { grid-column: span 7; }
+    .bento-span-8 { grid-column: span 8; }
+    .bento-span-12 { grid-column: span 12; }
+    @media(max-width:991px) {
+        .bento-span-4, .bento-span-5, .bento-span-6, .bento-span-7, .bento-span-8, .bento-span-12 { grid-column: span 1; }
+    }
+
+    /* Profile/Ocupación card (dark) */
+    .bento-dark {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        color: #fff;
+        border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.1);
+    }
+    .bento-dark:hover {
+        box-shadow: 0 16px 48px rgba(0,0,0,.2), 0 4px 8px rgba(0,0,0,.1);
+    }
+    .bento-dark .card-label { color: rgba(255,255,255,.5); }
+    .bento-dark .card-value { color: #fff; }
+
+    /* Card internals */
+    .bento-card .card-label {
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #999;
+        font-weight: 600;
+        margin-bottom: .5rem;
+    }
+    .bento-card .card-title-custom {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .bento-card .card-title-custom .title-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(184,134,11,.1);
+        border-radius: .6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #b8860b;
+        font-size: .85rem;
+    }
+    .bento-card .big-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #b8860b;
+    }
+    .bento-card .big-number-dark {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+    }
+
+    /* Stat pills */
+    .stat-pills {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+    .stat-pill {
+        background: rgba(184,134,11,.06);
+        border: 1px solid rgba(184,134,11,.12);
+        border-radius: 2rem;
+        padding: .35rem .85rem;
+        font-size: .75rem;
+        font-weight: 600;
+        color: #b8860b;
+    }
+    .stat-pill.green { background: rgba(22,163,74,.06); border-color: rgba(22,163,74,.12); color: #16a34a; }
+    .stat-pill.red { background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.12); color: #dc2626; }
+
+    /* Activity list */
+    .activity-list { list-style: none; padding: 0; margin: 0; }
+    .activity-list li {
+        padding: .85rem 0;
+        border-bottom: 1px solid rgba(184,134,11,.06);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: padding-left .15s ease;
+    }
+    .activity-list li:hover { padding-left: .5rem; }
+    .activity-list li:last-child { border-bottom: none; }
+    .activity-list .act-name { font-size: .85rem; font-weight: 600; color: #1a1a1a; }
+    .activity-list .act-sub { font-size: .73rem; color: #999; margin-top: .1rem; }
+    .activity-list .act-date {
+        font-size: .7rem;
+        color: #b8860b;
+        white-space: nowrap;
+        background: rgba(184,134,11,.06);
+        padding: .2rem .5rem;
+        border-radius: .25rem;
+        font-weight: 500;
+    }
+    .activity-list .empty { text-align: center; color: #bbb; padding: 2rem 0; font-size: .85rem; }
+
+    /* Quick actions */
+    .quick-actions {
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+    .quick-action-btn {
+        background: #b8860b;
+        color: #fff;
+        border: none;
+        border-radius: .5rem;
+        padding: .6rem 1.1rem;
+        font-size: .8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .quick-action-btn:hover { background: #9a7209; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(184,134,11,.25); }
+    .quick-action-btn.outline { background: transparent; color: #b8860b; border: 1px solid #b8860b; }
+    .quick-action-btn.outline:hover { background: #b8860b; color: #fff; }
+
+    /* Chart container */
+    .chart-container { position: relative; }
+
+    /* Section divider */
+    .bento-section-label {
+        grid-column: span 12;
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-top: .5rem;
+    }
+    .bento-section-label i { color: #b8860b; }
+    .bento-section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(184,134,11,.15);
+    }
+    @media(max-width:991px) { .bento-section-label { grid-column: span 1; } }
+</style>
+
+<div class="admin-wrapper">
+    <!-- Welcome -->
+    <div class="admin-welcome fade-in-up">
+        <div class="welcome-top">
+            <div>
+                <span class="welcome-badge"><i class="bi bi-shield-check"></i> Panel Administrativo</span>
+                <h1 class="mt-2">Bienvenido, {{ user.username }}</h1>
+                <p class="mb-0">Gestiona reservas, ocupación y reportes de Áurea Hotel & Resort.</p>
+            </div>
+            <div class="d-none d-md-block">
+                <div class="quick-actions">
+                    <a href="{% url 'reportes:reporte_reservas' %}" class="quick-action-btn"><i class="bi bi-bar-chart"></i> Reportes</a>
+                    <a href="{% url 'reportes:reporte_clientes' %}" class="quick-action-btn outline"><i class="bi bi-people"></i> Clientes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top metrics -->
+    <div class="top-metrics fade-in-up">
+        <div class="top-metric">
+            <div class="metric-icon gold"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="metric-num">{{ metricas.total_clientes }}</div>
+                <div class="metric-label">Clientes</div>
+            </div>
+        </div>
+        <div class="top-metric">
+            <div class="metric-icon gold"><i class="bi bi-calendar-check-fill"></i></div>
+            <div>
+                <div class="metric-num">{{ metricas.total_reservas }}</div>
+                <div class="metric-label">Reservas</div>
+            </div>
+        </div>
+        <div class="top-metric">
+            <div class="metric-icon green"><i class="bi bi-door-open-fill"></i></div>
+            <div>
+                <div class="metric-num">{{ metricas.habitaciones_disponibles }}</div>
+                <div class="metric-label">Disponibles</div>
+            </div>
+        </div>
+        <div class="top-metric">
+            <div class="metric-icon red"><i class="bi bi-lock-fill"></i></div>
+            <div>
+                <div class="metric-num">{{ metricas.habitaciones_ocupadas }}</div>
+                <div class="metric-label">Ocupadas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="bento-grid fade-in-up">
+
+        <!-- Ocupación card (dark) -->
+        <div class="bento-card bento-dark bento-span-4">
+            <div class="card-label">Tasa de ocupación</div>
+            <div class="big-number-dark">{{ metricas.tasa_ocupacion_general }}%</div>
+            <div class="stat-pills" style="margin-top:1.25rem;">
+                <span class="stat-pill" style="background:rgba(184,134,11,.15);border-color:rgba(184,134,11,.3);color:#b8860b;">{{ metricas.reservas_activas }} activas</span>
+                <span class="stat-pill" style="background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.2);color:#ff6b6b;">{{ metricas.reservas_canceladas }} canceladas</span>
+            </div>
+            <p style="margin-top:1.25rem; font-size:.78rem; color:rgba(255,255,255,.4); margin-bottom:0;">
+                {{ metricas.total_habitaciones }} habitaciones en total
+            </p>
+        </div>
+
+        <!-- Reservas por mes chart -->
+        <div class="bento-card bento-span-8">
+            <div class="card-title-custom">
+                Reservas por mes
+                <span class="title-icon"><i class="bi bi-graph-up"></i></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartReservasMes" height="130"></canvas>
+            </div>
+        </div>
+
+        <!-- Últimas reservas -->
+        <div class="bento-section-label"><i class="bi bi-activity"></i> Actividad reciente</div>
+        <div class="bento-card bento-span-5">
+            <div class="card-title-custom">
+                Últimas reservas
+                <span class="title-icon"><i class="bi bi-clock-history"></i></span>
+            </div>
+            <ul class="activity-list">
+                {% for reserva in actividad.reservas_recientes %}
+                <li>
+                    <div><div class="act-name">{{ reserva.nombre_cliente }}</div><div class="act-sub">Hab. {{ reserva.habitacion.numero }} · {{ reserva.get_estado_display }}</div></div>
+                    <div class="act-date">{{ reserva.fecha_creacion|date:'d/m/Y' }}</div>
+                </li>
+                {% empty %}<li class="empty"><i class="bi bi-inbox"></i> Sin reservas recientes</li>{% endfor %}
+            </ul>
+        </div>
+
+        <!-- Ocupación por mes -->
+        <div class="bento-card bento-span-7">
+            <div class="card-title-custom">
+                Ocupación por mes
+                <span class="title-icon"><i class="bi bi-bar-chart-fill"></i></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartOcupacionMes" height="140"></canvas>
+            </div>
+        </div>
+
+        <!-- Habitación más reservada -->
+        <div class="bento-section-label"><i class="bi bi-bar-chart"></i> Estadísticas</div>
+        <div class="bento-card bento-span-4">
+            <div class="card-title-custom">
+                Top habitaciones
+                <span class="title-icon"><i class="bi bi-trophy"></i></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartHabitaciones" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Estado de reservas -->
+        <div class="bento-card bento-span-4">
+            <div class="card-title-custom">
+                Estado reservas
+                <span class="title-icon"><i class="bi bi-pie-chart"></i></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartEstados" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Últimos clientes + Cambios -->
+        <div class="bento-card bento-span-4">
+            <div class="card-title-custom">
+                Últimos clientes
+                <span class="title-icon"><i class="bi bi-person-plus"></i></span>
+            </div>
+            <ul class="activity-list">
+                {% for cliente in actividad.clientes_recientes %}
+                <li><div><div class="act-name">{{ cliente.nombre_cliente }}</div><div class="act-sub">{{ cliente.email_cliente }}</div></div></li>
+                {% empty %}<li class="empty"><i class="bi bi-person-x"></i> Sin clientes recientes</li>{% endfor %}
+            </ul>
+        </div>
+
+        <!-- Clientes con más reservas -->
+        <div class="bento-card bento-span-6">
+            <div class="card-title-custom">
+                Clientes con más reservas
+                <span class="title-icon"><i class="bi bi-award"></i></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartClientes" height="140"></canvas>
+            </div>
+        </div>
+
+        <!-- Cambios recientes -->
+        <div class="bento-card bento-span-6">
+            <div class="card-title-custom">
+                Cambios recientes
+                <span class="title-icon"><i class="bi bi-arrow-repeat"></i></span>
+            </div>
+            <ul class="activity-list">
+                {% for habitacion in actividad.cambios_recientes %}
+                <li><div><div class="act-name">Habitación {{ habitacion.numero }}</div><div class="act-sub">Actualizada {{ habitacion.fecha_actualizacion|date:'d/m/Y H:i' }}</div></div></li>
+                {% empty %}<li class="empty"><i class="bi bi-journal-x"></i> Sin cambios recientes</li>{% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+
+{% else %}
+{# ===== DASHBOARD CLIENTE ===== #}
+<style>
+    .client-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2rem;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .client-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 240, 235, .65);
+    }
+    .client-wrapper > * {
+        position: relative;
+        z-index: 1;
+    }
+    @media(min-width:992px) { .client-wrapper { margin: -2rem calc(-1*(50vw - 570px)) -3rem; padding: 2.5rem calc(50vw - 570px); } }
+    .client-hero {
+        background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+        border-radius: 1.25rem;
+        padding: 2rem 2.5rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(184,134,11,.2);
+        margin-bottom: 1.5rem;
+    }
+    .client-hero::before { content:''; position:absolute; top:-40%; right:-8%; width:200px; height:200px; background:rgba(184,134,11,.06); border-radius:50%; }
+    .client-hero h2 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; }
+    .client-hero .hero-label { color:#b8860b; font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; font-weight:600; }
+    .client-card {
+        background: #fff;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(240,235,227,.8);
+        box-shadow: 0 2px 12px rgba(0,0,0,.03);
+        padding: 1.5rem;
+        transition: all .2s ease;
+        height: 100%;
+    }
+    .client-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); transform: translateY(-2px); }
+    .client-card i.card-icon { color: #b8860b; font-size: 2rem; }
+    .client-card h6 { font-weight: 600; color: #2c2c2c; margin-top: .75rem; }
+    .room-card-client {
+        background: #fff;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(240,235,227,.8);
+        box-shadow: 0 2px 12px rgba(0,0,0,.03);
+        overflow: hidden;
+        transition: all .2s ease;
+    }
+    .room-card-client:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); transform: translateY(-2px); }
+    .room-card-client .btn-primary { background:#b8860b; border-color:#b8860b; }
+    .room-card-client .btn-primary:hover { background:#9a7209; border-color:#9a7209; }
+    .section-label-client { font-family:'Playfair Display',serif; font-weight:600; font-size:1.1rem; color:#1a1a1a; margin-bottom:1rem; }
+    .section-label-client i { color:#b8860b; }
+    .btn-outline-gold { color:#b8860b; border:1px solid #b8860b; background:transparent; border-radius:.5rem; padding:.5rem 1rem; font-size:.85rem; font-weight:600; text-decoration:none; transition:all .2s; }
+    .btn-outline-gold:hover { background:#b8860b; color:#fff; }
+</style>
+
+<div class="client-wrapper">
+    <div class="client-hero fade-in-up">
+        <p class="hero-label mb-2">Áurea Hotel & Resort</p>
+        <h2 class="mb-1">Bienvenido, {{ user.username }}</h2>
+        <p class="mb-0" style="opacity:.7;font-size:.88rem;">Encuentra tu habitación ideal y gestiona tus reservas.</p>
+    </div>
+
+    <div class="row g-3 mb-4 fade-in-up">
+        <div class="col-md-6">
+            <div class="client-card d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3" style="background:rgba(184,134,11,.08);"><i class="bi bi-calendar-check fs-3" style="color:#b8860b;"></i></div>
+                <div><div class="text-muted small">Reservas activas</div><div class="fs-3 fw-bold" style="font-family:'Playfair Display',serif;">{{ total_reservas_activas }}</div></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="client-card d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3" style="background:rgba(22,163,74,.08);"><i class="bi bi-door-open text-success fs-3"></i></div>
+                <div><div class="text-muted small">Habitaciones disponibles</div><div class="fs-3 fw-bold" style="font-family:'Playfair Display',serif;">{{ total_habitaciones_disponibles }}</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4 fade-in-up">
+        <div class="col-md-4">
+            <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="client-card text-decoration-none d-block text-center py-4">
+                <i class="card-icon bi bi-search"></i><h6>Buscar disponibilidad</h6>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'reservas:carrito_detail' %}" class="client-card text-decoration-none d-block text-center py-4">
+                <i class="card-icon bi bi-cart3"></i><h6>Mi carrito</h6>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'reservas:buscar_reserva' %}" class="client-card text-decoration-none d-block text-center py-4">
+                <i class="card-icon bi bi-receipt"></i><h6>Consultar reserva</h6>
+            </a>
+        </div>
+    </div>
+
+    <h4 class="section-label-client"><i class="bi bi-door-open"></i> Habitaciones disponibles</h4>
+    {% if habitaciones_disponibles %}
+    <div class="row g-3 mb-4">
+        {% for habitacion in habitaciones_disponibles %}
+        <div class="col-md-6 col-lg-4">
+            <div class="room-card-client">
+                {% if habitacion.imagen %}
+                <img src="{{ habitacion.imagen.url }}" class="w-100" alt="Hab {{ habitacion.numero }}" style="height:170px;object-fit:cover;">
+                {% else %}
+                <div class="d-flex align-items-center justify-content-center" style="height:170px;background:linear-gradient(135deg,#f5f0e8,#ede8df);"><i class="bi bi-building" style="font-size:2rem;color:#b8860b;opacity:.4;"></i></div>
+                {% endif %}
+                <div class="p-3">
+                    <h6 class="fw-bold mb-1">Habitación {{ habitacion.numero }}</h6>
+                    <p class="text-muted small mb-1">{{ habitacion.tipo.nombre }} · {{ habitacion.capacidad }} huésped{{ habitacion.capacidad|pluralize:"es" }}</p>
+                    <p class="fw-bold mb-2" style="color:#b8860b;">${{ habitacion.precio_por_noche }} / noche</p>
+                    <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-cart-plus"></i> Reservar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mb-4"><a href="{% url 'habitaciones:habitacion_list' %}" class="btn-outline-gold">Ver todas <i class="bi bi-arrow-right"></i></a></div>
+    {% else %}
+    <div class="client-card text-center py-4 mb-4" style="color:#999;"><i class="bi bi-info-circle" style="color:#b8860b;"></i> No hay habitaciones disponibles en este momento.</div>
+    {% endif %}
+
+    <h4 class="section-label-client"><i class="bi bi-calendar-check"></i> Mis reservas activas</h4>
+    {% if reservas_activas %}
+    <div class="table-responsive" style="background:#fff;border-radius:1.25rem;border:1px solid #f0ebe3;box-shadow:0 2px 12px rgba(0,0,0,.03);">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background:#faf8f5;"><tr><th>Código</th><th>Habitación</th><th>Entrada</th><th>Salida</th><th>Estado</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+                {% for reserva in reservas_activas %}
+                <tr>
+                    <td><code style="color:#b8860b;">{{ reserva.codigo }}</code></td>
+                    <td>{{ reserva.habitacion.numero }} - {{ reserva.habitacion.tipo.nombre }}</td>
+                    <td>{{ reserva.fecha_entrada|date:"d/m/Y" }}</td>
+                    <td>{{ reserva.fecha_salida|date:"d/m/Y" }}</td>
+                    <td><span class="badge bg-{% if reserva.estado == 'confirmada' %}success{% else %}warning{% endif %}">{{ reserva.get_estado_display }}</span></td>
+                    <td class="fw-bold">${{ reserva.total }}</td>
+                    <td><a href="{% url 'reservas:reserva_detail' reserva.codigo %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="client-card text-center py-4" style="color:#999;"><i class="bi bi-info-circle" style="color:#b8860b;"></i> No tienes reservas activas. <a href="{% url 'habitaciones:buscar_disponibilidad' %}" style="color:#b8860b;font-weight:600;">Buscar habitaciones</a>.</div>
+    {% endif %}
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.role == 'admin' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const dashboardDataUrl = "{{ dashboard_data_url }}";
+    const buildChart = (id, cfg) => { const c = document.getElementById(id); if(c) new Chart(c, cfg); };
+    fetch(dashboardDataUrl).then(r => r.json()).then(data => {
+        buildChart('chartReservasMes', {type:'line',data:{labels:data.reservas_por_mes.labels,datasets:[{label:'Reservas',data:data.reservas_por_mes.values,borderColor:'#b8860b',backgroundColor:'rgba(184,134,11,.08)',tension:.4,fill:true,pointBackgroundColor:'#b8860b',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f5f0e8'}},x:{grid:{display:false}}}}});
+        buildChart('chartOcupacionMes', {type:'bar',data:{labels:data.ocupacion_por_mes.labels,datasets:[{label:'%',data:data.ocupacion_por_mes.values,backgroundColor:'#b8860b',borderRadius:8,barThickness:20}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'#f5f0e8'}},x:{grid:{display:false}}}}});
+        buildChart('chartHabitaciones', {type:'doughnut',data:{labels:data.habitaciones_mas_reservadas.labels,datasets:[{data:data.habitaciones_mas_reservadas.values,backgroundColor:['#b8860b','#d4a84b','#8b6914','#2c2c2c','#999'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+        buildChart('chartEstados', {type:'doughnut',data:{labels:data.estado_reservas.labels,datasets:[{data:data.estado_reservas.values,backgroundColor:['#d4a84b','#b8860b','#dc2626','#16a34a'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+        buildChart('chartClientes', {type:'bar',data:{labels:data.clientes_mas_reservas.labels,datasets:[{label:'Reservas',data:data.clientes_mas_reservas.values,backgroundColor:'#2c2c2c',borderRadius:8,barThickness:16}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f5f0e8'}},y:{grid:{display:false}}}}});
+    });
+</script>
+{% endif %}
+{% endblock %}

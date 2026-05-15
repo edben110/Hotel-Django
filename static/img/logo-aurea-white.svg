@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none">
+  <!-- Icono decorativo: arco dorado -->
+  <path d="M30 55 C30 35, 50 20, 50 20 C50 20, 70 35, 70 55" stroke="#b8860b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="20" x2="50" y2="55" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="37" y1="40" x2="63" y2="40" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Línea base -->
+  <line x1="28" y1="55" x2="72" y2="55" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+  <!-- Texto ÁUREA en blanco -->
+  <text x="90" y="48" font-family="Georgia, 'Playfair Display', serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="3">ÁUREA</text>
+  <!-- Subtítulo -->
+  <text x="91" y="64" font-family="'Inter', Arial, sans-serif" font-size="9" fill="#b8860b" letter-spacing="4" font-weight="500">HOTEL &amp; RESORT</text>
+</svg>

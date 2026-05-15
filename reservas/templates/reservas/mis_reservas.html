@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Reservas - Áurea{% endblock %}
+
+{% block content %}
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
+    .page-header-card { background:linear-gradient(145deg,#1a1a1a,#2c2c2c,#1f1a14); border-radius:1.5rem; padding:2rem 2.5rem; color:#fff; margin-bottom:2rem; border:1px solid rgba(184,134,11,.25); box-shadow:0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden; }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+
+    .reserva-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; transition:all .25s ease; }
+    .reserva-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.1); }
+    .reserva-card .card-header { background:rgba(250,248,245,.8); border-bottom:1px solid rgba(184,134,11,.08); padding:.85rem 1.5rem; }
+    .reserva-card .card-header code { font-size:.8rem; font-weight:700; color:#b8860b; background:rgba(184,134,11,.06); padding:.2rem .6rem; border-radius:.25rem; }
+    .reserva-card .card-body { padding:1.5rem; }
+    .reserva-card h5 { font-family:'Playfair Display',serif; font-weight:700; }
+    .reserva-card .reserva-info { font-size:.85rem; line-height:1.9; }
+    .reserva-card .reserva-info i { width:18px; color:#b8860b; }
+    .reserva-card .card-footer { background:rgba(250,248,245,.6); border-top:1px solid rgba(184,134,11,.08); padding:.85rem 1.5rem; }
+    .btn-gold-sm { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.45rem .9rem; font-size:.8rem; font-weight:600; text-decoration:none; transition:all .2s; display:inline-flex; align-items:center; gap:.3rem; }
+    .btn-gold-sm:hover { background:#9a7209; color:#fff; transform:translateY(-1px); }
+    .btn-outline-gold-sm { background:transparent; color:#b8860b; border:1px solid #b8860b; border-radius:.5rem; padding:.45rem .9rem; font-size:.8rem; font-weight:600; text-decoration:none; transition:all .2s; display:inline-flex; align-items:center; gap:.3rem; }
+    .btn-outline-gold-sm:hover { background:#b8860b; color:#fff; }
+
+    .empty-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:4rem 2rem; text-align:center; }
+    .empty-card i { color:#b8860b; opacity:.4; }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="position-relative" style="z-index:1;">
+            <h1><i class="bi bi-calendar-check"></i> Mis Reservas</h1>
+            <p>Aquí puedes ver todas tus reservas realizadas en Áurea</p>
+        </div>
+    </div>
+
+    {% if reservas %}
+    <div class="row g-4 fade-in-up">
+        {% for reserva in reservas %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card reserva-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <code>{{ reserva.codigo }}</code>
+                    <span class="badge bg-{% if reserva.estado == 'confirmada' %}success{% elif reserva.estado == 'pendiente' %}warning{% elif reserva.estado == 'cancelada' %}danger{% elif reserva.estado == 'completada' %}info{% else %}secondary{% endif %}" style="border-radius:2rem; font-size:.68rem;">
+                        {{ reserva.get_estado_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-2">Habitación {{ reserva.habitacion.numero }}</h5>
+                    <div class="reserva-info">
+                        <div><i class="bi bi-door-open"></i> {{ reserva.habitacion.tipo.nombre }}</div>
+                        <div><i class="bi bi-calendar-event"></i> {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}</div>
+                        <div><i class="bi bi-moon"></i> {{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}</div>
+                        <div><i class="bi bi-people"></i> {{ reserva.huespedes }} huésped{{ reserva.huespedes|pluralize:"es" }}</div>
+                        <div class="mt-2"><span class="fw-bold fs-5" style="color:#b8860b;">${{ reserva.total }}</span></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'reservas:reserva_detail' reserva.codigo %}" class="btn-gold-sm"><i class="bi bi-eye"></i> Ver detalles</a>
+                        {% if reserva.estado != 'cancelada' and reserva.estado != 'completada' %}
+                        <a href="{% url 'reservas:cancelar_reserva' reserva.codigo %}" class="btn-outline-gold-sm" style="color:#dc2626; border-color:#dc2626;"><i class="bi bi-x-circle"></i> Cancelar</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-card fade-in-up">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" fill="none" style="width:180px; height:auto; margin-bottom:1.5rem;">
+            <!-- Calendario -->
+            <rect x="45" y="50" width="110" height="90" rx="10" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.04)"/>
+            <rect x="45" y="50" width="110" height="25" rx="10" stroke="#b8860b" stroke-width="2" fill="rgba(184,134,11,.08)"/>
+            <line x1="70" y1="42" x2="70" y2="58" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="130" y1="42" x2="130" y2="58" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Llave -->
+            <circle cx="100" cy="108" r="10" stroke="#b8860b" stroke-width="1.5" fill="none"/>
+            <line x1="110" y1="108" x2="135" y2="108" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="130" y1="108" x2="130" y2="102" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="125" y1="108" x2="125" y2="103" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Decoración -->
+            <line x1="30" y1="148" x2="170" y2="148" stroke="#e8e0d5" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="35" cy="45" r="2" fill="#b8860b" opacity=".3"/>
+            <circle cx="165" cy="42" r="2.5" fill="#b8860b" opacity=".2"/>
+        </svg>
+        <h4 class="fw-semibold" style="font-family:'Playfair Display',serif; color:#1a1a1a;">No tienes reservas aún</h4>
+        <p style="color:#999; max-width:320px; margin:0 auto 1.5rem;">Explora nuestras habitaciones y realiza tu primera reserva en Áurea.</p>
+        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn-gold-sm" style="padding:.6rem 1.25rem; font-size:.88rem;"><i class="bi bi-search"></i> Buscar habitaciones</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

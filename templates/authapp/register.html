@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Registro - Hotel de Lujo{% endblock %}
+
+{% block content %}
+<style>
+    /* Ocultar navbar y footer del base para full-screen split */
+    .hotel-navbar-luxury,
+    .hotel-footer-luxury {
+        display: none !important;
+    }
+
+    /* ===== SPLIT SCREEN LAYOUT ===== */
+    .split-container {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Lado izquierdo: imagen */
+    .split-left {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .split-left img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .split-left-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, rgba(0,0,0,.15), rgba(0,0,0,.45));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 3rem;
+    }
+
+    .split-left-overlay h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: .5rem;
+        text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    .split-left-overlay p {
+        color: rgba(255,255,255,.85);
+        font-size: .9rem;
+        max-width: 350px;
+        line-height: 1.6;
+    }
+
+    .split-left-features {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1.5rem;
+    }
+
+    .split-left-features .feature {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        color: rgba(255,255,255,.9);
+        font-size: .85rem;
+        font-weight: 500;
+    }
+
+    .split-left-features .feature i {
+        color: #b8860b;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Lado derecho: registro */
+    .split-right {
+        width: 520px;
+        min-width: 450px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2.5rem 3rem;
+        position: relative;
+        overflow-y: auto;
+    }
+
+    .split-right-inner {
+        width: 100%;
+        max-width: 380px;
+    }
+
+    .split-brand {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #2c2c2c;
+        text-align: center;
+        margin-bottom: .25rem;
+        letter-spacing: .03em;
+    }
+
+    .split-brand-line {
+        width: 40px;
+        height: 2px;
+        background: #b8860b;
+        margin: 0 auto 1.75rem;
+        border-radius: 2px;
+    }
+
+    .split-right h2 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #2c2c2c;
+        text-align: center;
+        margin-bottom: .4rem;
+    }
+
+    .split-right .register-subtitle {
+        text-align: center;
+        color: #7a7a7a;
+        font-size: .83rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .split-right .form-label {
+        font-weight: 500;
+        font-size: .78rem;
+        color: #6b6b6b;
+        letter-spacing: .02em;
+    }
+
+    .split-right .form-control,
+    .split-right .form-select {
+        border: 1px solid #e8e0d5;
+        border-radius: .375rem;
+        padding: .7rem 1rem;
+        font-size: .88rem;
+        background: #faf8f5;
+        transition: all .2s ease;
+    }
+
+    .split-right .form-control:focus,
+    .split-right .form-select:focus {
+        border-color: #b8860b;
+        box-shadow: 0 0 0 3px rgba(184, 134, 11, .1);
+        background: #fff;
+    }
+
+    .btn-register {
+        background: #b8860b;
+        color: #fff;
+        border: none;
+        border-radius: .375rem;
+        padding: .8rem;
+        font-size: .9rem;
+        font-weight: 600;
+        letter-spacing: .03em;
+        width: 100%;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+    .btn-register:hover {
+        background: #9a7209;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(184, 134, 11, .25);
+    }
+
+    .split-divider {
+        position: relative;
+        text-align: center;
+        margin: 1.25rem 0;
+    }
+
+    .split-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e8e0d5;
+    }
+
+    .split-divider span {
+        background: #fff;
+        padding: 0 .75rem;
+        position: relative;
+        color: #bbb;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .split-footer {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: .75rem;
+        color: #bbb;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .split-container {
+            flex-direction: column;
+        }
+
+        .split-left {
+            height: 35vh;
+            min-height: 220px;
+        }
+
+        .split-right {
+            width: 100%;
+            min-width: unset;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .split-left-overlay {
+            padding: 2rem;
+        }
+
+        .split-left-overlay h1 {
+            font-size: 1.8rem;
+        }
+
+        .split-left-features {
+            display: none;
+        }
+    }
+</style>
+
+<div class="split-container">
+    <!-- Lado izquierdo: imagen + info -->
+    <div class="split-left">
+        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80" alt="Hotel de Lujo - Habitación">
+        <div class="split-left-overlay">
+            <h1>Únete a nosotros</h1>
+            <p>Crea tu cuenta y accede a habitaciones exclusivas con las mejores tarifas.</p>
+            <div class="split-left-features">
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Reservas en segundos
+                </div>
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Mejores precios garantizados
+                </div>
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Cancelación flexible
+                </div>
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Atención personalizada 24/7
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lado derecho: formulario de registro -->
+    <div class="split-right">
+        <div class="split-right-inner">
+            <div class="split-brand">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" style="height:42px;width:auto;">
+                    <path d="M30 55 C30 35, 50 20, 50 20 C50 20, 70 35, 70 55" stroke="#b8860b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <line x1="50" y1="20" x2="50" y2="55" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="37" y1="40" x2="63" y2="40" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="28" y1="55" x2="72" y2="55" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+                    <text x="90" y="48" font-family="Georgia, 'Playfair Display', serif" font-size="32" font-weight="700" fill="#2c2c2c" letter-spacing="3">ÁUREA</text>
+                    <text x="91" y="64" font-family="'Inter', Arial, sans-serif" font-size="9" fill="#b8860b" letter-spacing="4" font-weight="500">HOTEL &amp; RESORT</text>
+                </svg>
+            </div>
+            <div class="split-brand-line"></div>
+
+            <h2>Crear Cuenta</h2>
+            <p class="register-subtitle">Completa tus datos para comenzar</p>
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-register mt-2">Crear mi cuenta</button>
+            </form>
+
+            <div class="split-divider">
+                <span>o</span>
+            </div>
+
+            <p class="text-center mb-0" style="font-size:.85rem; color:#7a7a7a;">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'login' %}" style="color:#b8860b; font-weight:600; text-decoration:none;">Inicia sesión aquí</a>
+            </p>
+        </div>
+
+        <div class="split-footer">
+            &copy; 2025 Áurea Hotel & Resort. Todos los derechos reservados.
+        </div>
+    </div>
+</div>
+{% endblock %}
