@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Correo enviado{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <h2 class="mb-4">¡Cuenta creada!</h2>
+        <p class="lead">
+            Tu cuenta fue creada. Revisa tu correo para verificar la cuenta.
+        </p>
+        <hr>
+        <p class="text-muted">
+            ¿Ya verificaste tu cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
