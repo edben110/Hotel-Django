@@ -1,41 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}Verificación de Correo - Hotel{% endblock %}
+{% block title %}Verificación de Correo - Áurea{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body text-center p-5">
-                <h2 class="card-title mb-4">Verificación de Correo</h2>
+<style>
+    .hotel-navbar-luxury, .hotel-footer-luxury { display:none !important; }
+    .verify-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; background:linear-gradient(160deg,#f8f5f0,#f0ebe3); }
+    .verify-card { background:#fff; border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); border:1px solid #f0ebe3; max-width:450px; width:100%; padding:3rem 2.5rem; text-align:center; }
+    .verify-card .icon-circle { width:72px; height:72px; border-radius:50%; background:rgba(217,119,6,.08); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1.25rem; }
+    .verify-card .icon-circle i { font-size:2rem; color:#d97706; }
+    .verify-card h2 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.5rem; color:#1a1a1a; }
+    .verify-card p { color:#999; font-size:.9rem; }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.6rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-gold:hover { background:#9a7209; color:#fff; }
+    @media(max-width:576px) { .verify-card { padding:2rem 1.5rem; } .verify-card h2 { font-size:1.3rem; } }
+</style>
 
-                <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
-                         class="bi bi-exclamation-triangle text-warning" viewBox="0 0 16 16">
-                        <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1
-                            .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2
-                            0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0
-                            1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1
-                            .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0
-                            0-1.96 0L.165 13.233c-.457.778.091 1.767.98
-                            1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
-                        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1
-                            1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
-                    </svg>
-                </div>
-
-                <p class="text-muted mb-4">
-                    No fue posible verificar tu cuenta. El enlace puede ser inválido,
-                    haber expirado o ya haber sido utilizado.
-                </p>
-
-                <a href="{% url 'login' %}" class="btn btn-primary me-2">
-                    Iniciar sesión
-                </a>
-                <a href="{% url 'register' %}" class="btn btn-outline-secondary">
-                    Volver al registro
-                </a>
-            </div>
+<div class="verify-wrapper">
+    <div class="verify-card fade-in-up">
+        <div class="icon-circle"><i class="bi bi-exclamation-triangle"></i></div>
+        <h2>Verificación de Correo</h2>
+        <p>No fue posible verificar tu cuenta. El enlace puede ser inválido, haber expirado o ya haber sido utilizado.</p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+            <a href="{% url 'login' %}" class="btn-gold"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-secondary" style="border-radius:.5rem;">Volver al registro</a>
         </div>
     </div>
 </div>

@@ -1,33 +1,50 @@
 {% extends "base.html" %}
 
-{% block title %}Buscar mi reserva{% endblock %}
+{% block title %}Buscar mi reserva - Áurea{% endblock %}
 
 {% block content %}
-<h1>Buscar mi reserva</h1>
-<p class="text-muted">Ingresa el código que recibiste y el correo con el que reservaste.</p>
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(max-width:768px) { .page-wrapper { padding:1.5rem 1rem 3rem; } }
+    @media(max-width:576px) { .page-wrapper { padding:1rem .75rem 2.5rem; } }
 
-<div class="card">
-    <div class="card-body">
-        <form method="get" novalidate>
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Código</label>
+    .search-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); max-width:600px; margin:0 auto; overflow:hidden; }
+    .search-header { background:linear-gradient(145deg,#1a1a1a,#2c2c2c); padding:1.75rem 2rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }
+    .search-header h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.4rem; margin-bottom:.25rem; }
+    .search-header p { opacity:.6; font-size:.85rem; margin-bottom:0; }
+    .search-body { padding:2rem; }
+    .search-card .form-control { border:1px solid #e8e0d5; background:#faf8f5; border-radius:.5rem; padding:.7rem 1rem; }
+    .search-card .form-control:focus { border-color:#b8860b; box-shadow:0 0 0 3px rgba(184,134,11,.1); background:#fff; }
+    .search-card .form-label { font-weight:500; font-size:.8rem; color:#6b6b6b; }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.7rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; width:100%; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+    @media(max-width:576px) { .search-header { padding:1.25rem 1.5rem; } .search-body { padding:1.5rem; } .search-header h1 { font-size:1.2rem; } }
+</style>
+
+<div class="page-wrapper">
+    <div class="search-card fade-in-up">
+        <div class="search-header">
+            <h1><i class="bi bi-search"></i> Buscar mi reserva</h1>
+            <p>Ingresa el código y correo con el que reservaste</p>
+        </div>
+        <div class="search-body">
+            <form method="get" novalidate>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-hash" style="color:#b8860b;"></i> Código de reserva</label>
                     {{ form.codigo }}
-                    {% for error in form.codigo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    {% for error in form.codigo.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Correo</label>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-envelope" style="color:#b8860b;"></i> Correo electrónico</label>
                     {{ form.email }}
-                    {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
-                <div class="col-md-2 mb-3 d-grid align-items-end">
-                    <label class="form-label invisible">.</label>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i> Buscar
-                    </button>
-                </div>
-            </div>
-        </form>
+                <button type="submit" class="btn-gold mt-2"><i class="bi bi-search"></i> Buscar reserva</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

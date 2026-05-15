@@ -1,64 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}Reserva confirmada{% endblock %}
+{% block title %}Reserva confirmada - Áurea{% endblock %}
 
 {% block content %}
-<div class="text-center mb-4">
-    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-    <h1 class="mt-2">¡Pago aprobado!</h1>
-    <p class="text-muted">Procesado por <strong>{{ gateway_name }}</strong></p>
-</div>
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(max-width:768px) { .page-wrapper { padding:1.5rem 1rem 3rem; } }
+    @media(max-width:576px) { .page-wrapper { padding:1rem .75rem 2.5rem; } }
 
-<div class="card border-success mb-3">
-    <div class="card-body">
-        <h5 class="card-title">Detalle del pago</h5>
-        <dl class="row mb-0">
-            <dt class="col-sm-4">Pasarela</dt>
-            <dd class="col-sm-8">{{ gateway_name }}</dd>
-            <dt class="col-sm-4">Código de autorización</dt>
-            <dd class="col-sm-8"><code>{{ resultado.codigo_autorizacion }}</code></dd>
-            <dt class="col-sm-4">Referencia</dt>
-            <dd class="col-sm-8"><code>{{ resultado.referencia }}</code></dd>
-            <dt class="col-sm-4">Tarjeta</dt>
-            <dd class="col-sm-8">{{ resultado.marca|capfirst }} **** {{ resultado.ultimos_4 }}</dd>
-        </dl>
+    .success-hero { text-align:center; margin-bottom:2rem; }
+    .success-hero .icon-circle { width:80px; height:80px; border-radius:50%; background:rgba(22,163,74,.08); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem; }
+    .success-hero .icon-circle i { font-size:2.5rem; color:#16a34a; }
+    .success-hero h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.8rem; color:#1a1a1a; }
+    .success-hero p { color:#999; font-size:.9rem; }
+
+    .glass-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:1.75rem; margin-bottom:1.5rem; }
+    .glass-card h5 { font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; }
+    .glass-card code { color:#b8860b; background:rgba(184,134,11,.08); padding:.15rem .4rem; border-radius:.25rem; }
+    .glass-card .badge { border-radius:2rem; }
+
+    .reserva-item { border:1px solid rgba(184,134,11,.1); border-radius:1.25rem; padding:1.5rem; margin-bottom:1rem; background:rgba(255,255,255,.5); }
+    .reserva-item h5 { font-family:'Playfair Display',serif; font-weight:600; font-size:1rem; }
+    .btn-gold-sm { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.45rem .9rem; font-size:.8rem; font-weight:600; text-decoration:none; transition:all .2s; display:inline-flex; align-items:center; gap:.3rem; }
+    .btn-gold-sm:hover { background:#9a7209; color:#fff; }
+    @media(max-width:576px) { .success-hero h1 { font-size:1.4rem; } }
+</style>
+
+<div class="page-wrapper">
+    <div class="success-hero fade-in-up">
+        <div class="icon-circle"><i class="bi bi-check-circle-fill"></i></div>
+        <h1>¡Pago aprobado!</h1>
+        <p>Procesado por <strong>{{ gateway_name }}</strong></p>
     </div>
-</div>
 
-<h4>Tus reservas</h4>
-{% for reserva in reservas %}
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <h5>Habitación {{ reserva.habitacion.numero }} ·
-                    <span class="text-muted">{{ reserva.habitacion.tipo.nombre }}</span>
-                </h5>
-                <p class="mb-1">
-                    <strong>Código:</strong> <code class="fs-5">{{ reserva.codigo }}</code>
-                </p>
-                <p class="mb-1"><strong>Cliente:</strong> {{ reserva.nombre_cliente }} ({{ reserva.email_cliente }})</p>
-                <p class="mb-0">
-                    <strong>Fechas:</strong>
-                    {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}
-                    ({{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }})
-                </p>
-            </div>
-            <div class="text-end">
-                <span class="badge bg-success fs-6">{{ reserva.get_estado_display }}</span>
-                <h3 class="mt-2 mb-0">${{ reserva.total }}</h3>
-            </div>
+    <div class="glass-card fade-in-up">
+        <h5 class="mb-3"><i class="bi bi-credit-card" style="color:#b8860b;"></i> Detalle del pago</h5>
+        <div class="row g-3">
+            <div class="col-sm-6"><div class="small" style="color:#999;">Pasarela</div><div class="fw-semibold">{{ gateway_name }}</div></div>
+            <div class="col-sm-6"><div class="small" style="color:#999;">Autorización</div><div class="fw-semibold"><code>{{ resultado.codigo_autorizacion }}</code></div></div>
+            <div class="col-sm-6"><div class="small" style="color:#999;">Referencia</div><div class="fw-semibold"><code>{{ resultado.referencia }}</code></div></div>
+            <div class="col-sm-6"><div class="small" style="color:#999;">Tarjeta</div><div class="fw-semibold">{{ resultado.marca|capfirst }} **** {{ resultado.ultimos_4 }}</div></div>
         </div>
     </div>
-    <div class="card-footer">
-        <a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn btn-outline-primary">
-            Ver detalle
-        </a>
-    </div>
-</div>
-{% endfor %}
 
-<div class="text-center mt-4">
-    <a href="{% url 'reservas:habitaciones_disponibles' %}" class="btn btn-link">Volver al inicio</a>
+    <h4 style="font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; margin-bottom:1rem;" class="fade-in-up">Tus reservas</h4>
+    {% for reserva in reservas %}
+    <div class="glass-card reserva-item fade-in-up">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+                <h5>Habitación {{ reserva.habitacion.numero }} · <span style="color:#999; font-weight:400;">{{ reserva.habitacion.tipo.nombre }}</span></h5>
+                <p class="mb-1" style="font-size:.88rem;"><strong>Código:</strong> <code class="fs-6">{{ reserva.codigo }}</code></p>
+                <p class="mb-1" style="font-size:.88rem;"><strong>Cliente:</strong> {{ reserva.nombre_cliente }}</p>
+                <p class="mb-0" style="font-size:.88rem;"><strong>Fechas:</strong> {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }} ({{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }})</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-success">{{ reserva.get_estado_display }}</span>
+                <div class="fs-4 fw-bold mt-1" style="color:#b8860b;">${{ reserva.total }}</div>
+            </div>
+        </div>
+        <div class="mt-3"><a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn-gold-sm"><i class="bi bi-eye"></i> Ver detalle</a></div>
+    </div>
+    {% endfor %}
+
+    <div class="text-center mt-3 fade-in-up">
+        <a href="{% url 'home' %}" style="color:#b8860b; font-weight:600; text-decoration:none;"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+    </div>
 </div>
 {% endblock %}

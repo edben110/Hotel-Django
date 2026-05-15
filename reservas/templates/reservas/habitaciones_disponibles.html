@@ -1,46 +1,69 @@
 {% extends "base.html" %}
 
-{% block title %}Habitaciones disponibles{% endblock %}
+{% block title %}Habitaciones disponibles - Áurea{% endblock %}
 
 {% block content %}
-<h1><i class="bi bi-building"></i> Habitaciones disponibles</h1>
-<p class="text-muted">Selecciona una habitación para iniciar tu reserva.</p>
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(max-width:768px) { .page-wrapper { padding:1.5rem 1rem 3rem; } }
+    @media(max-width:576px) { .page-wrapper { padding:1rem .75rem 2.5rem; } }
 
-{% if habitaciones %}
-<div class="row">
-    {% for habitacion in habitaciones %}
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            {% if habitacion.imagen %}
-                {% if habitacion.tiene_imagen_real %}
+    .page-header-card { background:linear-gradient(145deg,#1a1a1a,#2c2c2c,#1f1a14); border-radius:1.5rem; padding:2rem 2.5rem; color:#fff; margin-bottom:2rem; border:1px solid rgba(184,134,11,.25); box-shadow:0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden; }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.6rem; margin-bottom:.25rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.88rem; }
+
+    .room-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; transition:all .25s ease; }
+    .room-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.1); }
+    .room-card .card-img-top { height:160px; object-fit:cover; }
+    .room-card .card-img-placeholder { height:160px; background:linear-gradient(135deg,#f5f0e8,#ede8df); display:flex; align-items:center; justify-content:center; }
+    .room-card .card-img-placeholder i { font-size:2rem; color:#b8860b; opacity:.3; }
+    .room-card .card-body { padding:1.25rem 1.5rem; }
+    .room-card h5 { font-family:'Playfair Display',serif; font-weight:700; font-size:1rem; }
+    .room-card .price { font-family:'Playfair Display',serif; font-weight:700; color:#b8860b; font-size:1.05rem; }
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.55rem 1rem; font-weight:600; font-size:.82rem; transition:all .2s; text-decoration:none; width:100%; display:block; text-align:center; }
+    .btn-gold:hover { background:#9a7209; color:#fff; }
+    @media(max-width:768px) { .page-header-card { padding:1.5rem; } .page-header-card h1 { font-size:1.3rem; } }
+    @media(max-width:576px) { .page-header-card { padding:1.25rem; } .page-header-card h1 { font-size:1.15rem; } }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="position-relative" style="z-index:1;">
+            <h1><i class="bi bi-building"></i> Habitaciones disponibles</h1>
+            <p>Selecciona una habitación para iniciar tu reserva en Áurea</p>
+        </div>
+    </div>
+
+    {% if habitaciones %}
+    <div class="row g-4 fade-in-up">
+        {% for habitacion in habitaciones %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card room-card h-100">
+                {% if habitacion.imagen %}
                 <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}">
                 {% else %}
                 <div class="card-img-placeholder"><i class="bi bi-building"></i></div>
                 {% endif %}
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
-                <p class="card-text mb-1">
-                    <strong>Tipo:</strong> {{ habitacion.tipo.nombre }}<br>
-                    <strong>Capacidad:</strong> {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}<br>
-                    <strong>Precio:</strong> ${{ habitacion.precio_por_noche }}/noche
-                </p>
-                {% if habitacion.descripcion %}
-                <p class="text-muted small">{{ habitacion.descripcion|truncatechars:100 }}</p>
-                {% endif %}
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success w-100">
-                    <i class="bi bi-cart-plus"></i> Reservar
-                </a>
+                <div class="card-body">
+                    <h5>Habitación {{ habitacion.numero }}</h5>
+                    <p class="small mb-1" style="color:#999;">{{ habitacion.tipo.nombre }} · {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</p>
+                    <p class="price mb-2">${{ habitacion.precio_por_noche }} <small style="font-weight:400; color:#999; font-family:'Inter',sans-serif;">/ noche</small></p>
+                    {% if habitacion.descripcion %}<p class="text-muted small mb-2">{{ habitacion.descripcion|truncatechars:80 }}</p>{% endif %}
+                    <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn-gold"><i class="bi bi-cart-plus"></i> Reservar</a>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+    {% else %}
+    <div class="glass-card text-center py-4 fade-in-up" style="background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); padding:3rem;">
+        <i class="bi bi-info-circle" style="font-size:2rem; color:#b8860b; opacity:.5;"></i>
+        <p class="mt-2 mb-0" style="color:#999;">No hay habitaciones disponibles en este momento.</p>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> No hay habitaciones disponibles en este momento.
-</div>
-{% endif %}
 {% endblock %}
