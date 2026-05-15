@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Disponibilidad{% endblock %}
+
+{% block content %}
+<h1>Buscar Habitaciones Disponibles</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" novalidate>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label">Fecha de Entrada</label>
+                    {{ form.fecha_entrada }}
+                    {% if form.fecha_entrada.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.fecha_entrada.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">Fecha de Salida</label>
+                    {{ form.fecha_salida }}
+                    {% if form.fecha_salida.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.fecha_salida.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
+                    {{ form.tipo }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.capacidad_minima.id_for_label }}" class="form-label">Capacidad Mínima</label>
+                    {{ form.capacidad_minima }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if habitaciones is not None %}
+    <h2>Resultados</h2>
+    {% if habitaciones %}
+        <div class="row">
+            {% for habitacion in habitaciones %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
+                        <p class="card-text">
+                            <strong>Tipo:</strong> {{ habitacion.tipo.nombre }}<br>
+                            <strong>Capacidad:</strong> {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}<br>
+                            <strong>Precio:</strong> ${{ habitacion.precio_por_noche }}/noche
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-sm btn-outline-primary">
+                            Ver detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No se encontraron habitaciones disponibles para los criterios seleccionados.
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Precios por Temporada{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Precios por Temporada</h1>
+    <a href="{% url 'habitaciones:precio_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nuevo Precio
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Tipo de Habitación</th>
+                <th>Temporada</th>
+                <th>Precio</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for precio in precios %}
+            <tr>
+                <td>{{ precio.tipo_habitacion.nombre }}</td>
+                <td>
+                    <span class="badge bg-{% if precio.temporada == 'alta' %}danger{% elif precio.temporada == 'media' %}warning{% else %}info{% endif %}">
+                        {{ precio.get_temporada_display }}
+                    </span>
+                </td>
+                <td>${{ precio.precio }}</td>
+                <td>{{ precio.fecha_inicio|date:"d/m/Y" }}</td>
+                <td>{{ precio.fecha_fin|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'habitaciones:precio_update' precio.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'habitaciones:precio_delete' precio.pk %}" class="btn btn-sm btn-danger" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No hay precios por temporada registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

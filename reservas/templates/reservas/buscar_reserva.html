@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar mi reserva{% endblock %}
+
+{% block content %}
+<h1>Buscar mi reserva</h1>
+<p class="text-muted">Ingresa el código que recibiste y el correo con el que reservaste.</p>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" novalidate>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Código</label>
+                    {{ form.codigo }}
+                    {% for error in form.codigo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Correo</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-2 mb-3 d-grid align-items-end">
+                    <label class="form-label invisible">.</label>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

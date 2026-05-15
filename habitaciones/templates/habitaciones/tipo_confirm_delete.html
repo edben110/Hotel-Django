@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Tipo de Habitación{% endblock %}
+
+{% block content %}
+<h1>Eliminar Tipo de Habitación</h1>
+
+<div class="card border-danger">
+    <div class="card-body">
+        <p class="text-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            ¿Estás seguro de que deseas eliminar el tipo <strong>"{{ tipo.nombre }}"</strong>?
+        </p>
+        <p>Esta acción no se puede deshacer. Si hay habitaciones asociadas, no se podrá eliminar.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Sí, eliminar
+                </button>
+                <a href="{% url 'habitaciones:tipo_list' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
