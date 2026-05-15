@@ -1,124 +1,131 @@
 {% extends 'base.html' %}
-{% block title %}{{ titulo }}{% endblock %}
+{% block title %}{{ titulo }} - Áurea{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h1 class="h3 mb-1">{{ titulo }}</h1>
-        <p class="text-muted mb-0">{{ total_registros }} registro(s) según los filtros actuales.</p>
-    </div>
-    <div class="btn-group">
-        <a class="btn btn-outline-danger" href="{{ export_pdf_url }}?{{ request.GET.urlencode }}">PDF</a>
-    </div>
-</div>
+<style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem; padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px); position: relative;
+    }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3">
-            <div class="col-md-3">{{ form.fecha_inicio.label_tag }}{{ form.fecha_inicio }}</div>
-            <div class="col-md-3">{{ form.fecha_fin.label_tag }}{{ form.fecha_fin }}</div>
-            <div class="col-md-3">{{ form.estado_reserva.label_tag }}{{ form.estado_reserva }}</div>
-            <div class="col-md-3">{{ form.estado_habitacion.label_tag }}{{ form.estado_habitacion }}</div>
-            <div class="col-md-4">{{ form.cliente.label_tag }}{{ form.cliente }}</div>
-            <div class="col-md-4">{{ form.habitacion.label_tag }}{{ form.habitacion }}</div>
-            <div class="col-md-4">{{ form.tipo_habitacion.label_tag }}{{ form.tipo_habitacion }}</div>
-            <div class="col-12 d-flex gap-2">
-                <button class="btn btn-primary" type="submit">Aplicar filtros</button>
-                <a class="btn btn-outline-secondary" href=".">Limpiar</a>
+    .page-header-card {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        border-radius: 1.5rem; padding: 1.75rem 2.5rem; color: #fff;
+        margin-bottom: 2rem; border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15); position:relative; overflow:hidden;
+    }
+    .page-header-card::before { content:''; position:absolute; top:-50%; right:-10%; width:300px; height:300px; background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%); border-radius:50%; }
+    .page-header-card h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.4rem; margin-bottom:.15rem; }
+    .page-header-card p { opacity:.6; margin-bottom:0; font-size:.85rem; }
+    .btn-gold-sm { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.5rem 1rem; font-size:.8rem; font-weight:600; text-decoration:none; transition:all .2s; }
+    .btn-gold-sm:hover { background:#9a7209; color:#fff; }
+
+    .glass-card {
+        background: rgba(255,255,255,.95); backdrop-filter:blur(12px);
+        border:1px solid rgba(255,255,255,.8); border-radius:1.5rem;
+        box-shadow:0 4px 24px rgba(0,0,0,.06); margin-bottom:1.5rem; overflow:hidden;
+    }
+    .glass-card .card-body { padding:1.75rem; }
+    .glass-card .form-control, .glass-card .form-select { border:1px solid #e8e0d5; background:#faf8f5; border-radius:.5rem; padding:.6rem .85rem; font-size:.85rem; }
+    .glass-card .form-control:focus, .glass-card .form-select:focus { border-color:#b8860b; box-shadow:0 0 0 3px rgba(184,134,11,.1); background:#fff; }
+
+    .table-card {
+        background: rgba(255,255,255,.95); backdrop-filter:blur(12px);
+        border:1px solid rgba(255,255,255,.8); border-radius:1.5rem;
+        box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden;
+    }
+    .table-card .table { margin-bottom:0; }
+    .table-card .table thead th { background:#faf8f5; border-bottom:1px solid rgba(184,134,11,.08); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#999; font-weight:600; padding:.85rem 1.25rem; }
+    .table-card .table tbody td { padding:.85rem 1.25rem; vertical-align:middle; border-color:rgba(184,134,11,.06); font-size:.88rem; }
+    .table-card .badge { font-size:.7rem; padding:.3rem .6rem; border-radius:2rem; }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-card fade-in-up">
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index:1;">
+            <div>
+                <h1><i class="bi bi-file-earmark-bar-graph"></i> {{ titulo }}</h1>
+                <p>{{ total_registros }} registro(s) según los filtros actuales.</p>
             </div>
-        </form>
+            <a class="btn-gold-sm" href="{{ export_pdf_url }}?{{ request.GET.urlencode }}"><i class="bi bi-file-pdf"></i> Exportar PDF</a>
+        </div>
     </div>
-</div>
 
-<div class="card shadow-sm">
-    <div class="card-body table-responsive">
-        {% if modo == 'reservas' %}
+    <div class="glass-card fade-in-up">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">{{ form.fecha_inicio.label_tag }}{{ form.fecha_inicio }}</div>
+                <div class="col-md-3">{{ form.fecha_fin.label_tag }}{{ form.fecha_fin }}</div>
+                <div class="col-md-3">{{ form.estado_reserva.label_tag }}{{ form.estado_reserva }}</div>
+                <div class="col-md-3">{{ form.estado_habitacion.label_tag }}{{ form.estado_habitacion }}</div>
+                <div class="col-md-4">{{ form.cliente.label_tag }}{{ form.cliente }}</div>
+                <div class="col-md-4">{{ form.habitacion.label_tag }}{{ form.habitacion }}</div>
+                <div class="col-md-4">{{ form.tipo_habitacion.label_tag }}{{ form.tipo_habitacion }}</div>
+                <div class="col-12 d-flex gap-2">
+                    <button class="btn-gold-sm" type="submit"><i class="bi bi-funnel"></i> Aplicar filtros</button>
+                    <a class="btn btn-outline-secondary btn-sm" href="." style="border-radius:.5rem;">Limpiar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-card fade-in-up">
+        <div class="table-responsive">
+            {% if modo == 'reservas' %}
             <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Código</th>
-                        <th>Cliente</th>
-                        <th>Habitación</th>
-                        <th>Ingreso</th>
-                        <th>Salida</th>
-                        <th>Estado</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Código</th><th>Cliente</th><th>Habitación</th><th>Ingreso</th><th>Salida</th><th>Estado</th><th>Total</th></tr></thead>
                 <tbody>
                     {% for reserva in reservas %}
-                        <tr>
-                            <td>{{ reserva.codigo }}</td>
-                            <td>
-                                <div class="fw-semibold">{{ reserva.nombre_cliente }}</div>
-                                <div class="text-muted small">{{ reserva.email_cliente }}</div>
-                            </td>
-                            <td>{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipo.nombre }}</td>
-                            <td>{{ reserva.fecha_entrada }}</td>
-                            <td>{{ reserva.fecha_salida }}</td>
-                            <td><span class="badge text-bg-secondary">{{ reserva.get_estado_display }}</span></td>
-                            <td>${{ reserva.total }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="7" class="text-center text-muted py-4">No hay reservas para mostrar.</td></tr>
-                    {% endfor %}
+                    <tr>
+                        <td><code style="color:#b8860b;">{{ reserva.codigo }}</code></td>
+                        <td><div class="fw-semibold">{{ reserva.nombre_cliente }}</div><div class="text-muted small">{{ reserva.email_cliente }}</div></td>
+                        <td>{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipo.nombre }}</td>
+                        <td>{{ reserva.fecha_entrada }}</td>
+                        <td>{{ reserva.fecha_salida }}</td>
+                        <td><span class="badge text-bg-secondary">{{ reserva.get_estado_display }}</span></td>
+                        <td class="fw-bold">${{ reserva.total }}</td>
+                    </tr>
+                    {% empty %}<tr><td colspan="7" class="text-center py-4" style="color:#999;">No hay reservas para mostrar.</td></tr>{% endfor %}
                 </tbody>
             </table>
-        {% elif modo == 'clientes' %}
+            {% elif modo == 'clientes' %}
             <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Email</th>
-                        <th>Total reservas</th>
-                        <th>Total gastado</th>
-                        <th>Primera reserva</th>
-                        <th>Última reserva</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Cliente</th><th>Email</th><th>Total reservas</th><th>Total gastado</th><th>Primera reserva</th><th>Última reserva</th></tr></thead>
                 <tbody>
                     {% for fila in filas_clientes %}
-                        <tr>
-                            <td class="fw-semibold">{{ fila.nombre_cliente }}</td>
-                            <td>{{ fila.email_cliente }}</td>
-                            <td>{{ fila.total_reservas }}</td>
-                            <td>${{ fila.total_gastado }}</td>
-                            <td>{{ fila.primera_reserva|default:'-' }}</td>
-                            <td>{{ fila.ultima_reserva|default:'-' }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="6" class="text-center text-muted py-4">No hay clientes para mostrar.</td></tr>
-                    {% endfor %}
+                    <tr>
+                        <td class="fw-semibold">{{ fila.nombre_cliente }}</td>
+                        <td>{{ fila.email_cliente }}</td>
+                        <td>{{ fila.total_reservas }}</td>
+                        <td class="fw-bold" style="color:#b8860b;">${{ fila.total_gastado }}</td>
+                        <td>{{ fila.primera_reserva|default:'-' }}</td>
+                        <td>{{ fila.ultima_reserva|default:'-' }}</td>
+                    </tr>
+                    {% empty %}<tr><td colspan="6" class="text-center py-4" style="color:#999;">No hay clientes para mostrar.</td></tr>{% endfor %}
                 </tbody>
             </table>
-        {% else %}
+            {% else %}
             <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Habitación</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Capacidad</th>
-                        <th>Precio/Noche</th>
-                        <th>Reservas</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Habitación</th><th>Tipo</th><th>Estado</th><th>Capacidad</th><th>Precio/Noche</th><th>Reservas</th></tr></thead>
                 <tbody>
                     {% for fila in filas_habitaciones %}
-                        <tr>
-                            <td class="fw-semibold">{{ fila.habitacion.numero }}</td>
-                            <td>{{ fila.habitacion.tipo.nombre }}</td>
-                            <td>{{ fila.habitacion.get_estado_display }}</td>
-                            <td>{{ fila.habitacion.capacidad }}</td>
-                            <td>${{ fila.habitacion.precio_por_noche }}</td>
-                            <td>{{ fila.total_reservas }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="6" class="text-center text-muted py-4">No hay habitaciones para mostrar.</td></tr>
-                    {% endfor %}
+                    <tr>
+                        <td class="fw-semibold">{{ fila.habitacion.numero }}</td>
+                        <td>{{ fila.habitacion.tipo.nombre }}</td>
+                        <td>{{ fila.habitacion.get_estado_display }}</td>
+                        <td>{{ fila.habitacion.capacidad }}</td>
+                        <td style="color:#b8860b; font-weight:600;">${{ fila.habitacion.precio_por_noche }}</td>
+                        <td>{{ fila.total_reservas }}</td>
+                    </tr>
+                    {% empty %}<tr><td colspan="6" class="text-center py-4" style="color:#999;">No hay habitaciones para mostrar.</td></tr>{% endfor %}
                 </tbody>
             </table>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

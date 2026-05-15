@@ -1,193 +1,128 @@
 {% extends "base.html" %}
 
-{% block title %}Habitación {{ habitacion.numero }}{% endblock %}
+{% block title %}Habitación {{ habitacion.numero }} - Áurea{% endblock %}
 
 {% block content %}
 <style>
+    .page-wrapper {
+        background: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
+        margin: -2rem -0.75rem -3rem;
+        padding: 2.5rem 2rem 4rem;
+        min-height: calc(100vh - 70px);
+        position: relative;
+    }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+
     .room-hero {
-        border-radius: var(--hotel-radius-lg);
+        border-radius: 1.5rem;
         overflow: hidden;
         position: relative;
-        height: 300px;
-        background: linear-gradient(135deg, #1e293b, #334155);
+        height: 320px;
         margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,.12);
     }
-    .room-hero img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    .room-hero img { width:100%; height:100%; object-fit:cover; }
     .room-hero-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 2rem;
-        background: linear-gradient(transparent, rgba(15, 23, 42, .85));
-        color: #fff;
+        position:absolute; bottom:0; left:0; right:0; padding:2rem;
+        background: linear-gradient(transparent, rgba(26,26,26,.9));
+        color:#fff;
     }
-    .room-hero-overlay h1 {
-        font-weight: 800;
-        font-size: 2rem;
-        margin-bottom: .25rem;
-    }
+    .room-hero-overlay h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:2rem; margin-bottom:.25rem; }
     .room-hero-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #e2e8f0, #f1f5f9);
+        width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+        background: linear-gradient(135deg, #f5f0e8, #ede8df);
     }
-    .room-hero-placeholder i {
-        font-size: 4rem;
-        color: #94a3b8;
-    }
-    .room-info-card {
-        border: none;
-        border-radius: var(--hotel-radius-lg);
-        box-shadow: var(--hotel-shadow-lg);
-    }
-    .room-info-card .info-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid var(--hotel-border);
-    }
-    .room-info-card .info-item:last-child {
-        border-bottom: none;
-    }
-    .room-info-card .info-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: .625rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-    .room-info-card .info-label {
-        font-size: .75rem;
-        color: var(--hotel-gray);
-        text-transform: uppercase;
-        letter-spacing: .05em;
-        font-weight: 600;
-    }
-    .room-info-card .info-value {
-        font-weight: 600;
-        color: var(--hotel-dark);
-        font-size: .95rem;
-    }
-    .room-price-card {
-        border: none;
-        border-radius: var(--hotel-radius-lg);
-        box-shadow: var(--hotel-shadow-lg);
-        background: linear-gradient(135deg, var(--hotel-primary), var(--hotel-accent));
-        color: #fff;
-        text-align: center;
+    .room-hero-placeholder i { font-size:4rem; color:#b8860b; opacity:.3; }
+
+    .info-card {
+        background: rgba(255,255,255,.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
         padding: 2rem;
     }
-    .room-price-card .price {
-        font-size: 2.5rem;
-        font-weight: 800;
-        line-height: 1;
+    .info-card h4 { font-family:'Playfair Display',serif; font-weight:600; color:#1a1a1a; }
+    .info-item { display:flex; align-items:center; padding:1rem 0; border-bottom:1px solid rgba(184,134,11,.08); }
+    .info-item:last-child { border-bottom:none; }
+    .info-icon {
+        width:44px; height:44px; border-radius:.75rem;
+        display:flex; align-items:center; justify-content:center;
+        margin-right:1rem; font-size:1.1rem; flex-shrink:0;
+        background:rgba(184,134,11,.08); color:#b8860b;
     }
-    .room-price-card .price-label {
-        font-size: .85rem;
-        opacity: .8;
+    .info-label { font-size:.72rem; color:#999; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+    .info-value { font-weight:600; color:#1a1a1a; font-size:.95rem; }
+
+    .price-card {
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
+        border: 1px solid rgba(184,134,11,.25);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,.15);
+        color:#fff; text-align:center; padding:2rem;
     }
+    .price-card .price { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:700; color:#b8860b; }
+    .price-card .price-label { font-size:.8rem; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.05em; }
+
+    .btn-gold { background:#b8860b; color:#fff; border:none; border-radius:.5rem; padding:.7rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-gold:hover { background:#9a7209; color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(184,134,11,.3); }
+    .btn-outline-back { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:.5rem; padding:.7rem 1.25rem; font-weight:600; font-size:.88rem; color:#666; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s; }
+    .btn-outline-back:hover { border-color:#b8860b; color:#b8860b; }
 </style>
 
-<!-- Hero Image -->
-<div class="room-hero fade-in-up">
-    {% if habitacion.imagen %}
-    <img src="{{ habitacion.imagen.url }}" alt="Habitación {{ habitacion.numero }}">
-    {% else %}
-    <div class="room-hero-placeholder">
-        <i class="bi bi-image"></i>
+<div class="page-wrapper">
+    <div class="room-hero fade-in-up">
+        {% if habitacion.imagen %}
+        <img src="{{ habitacion.imagen.url }}" alt="Habitación {{ habitacion.numero }}">
+        {% else %}
+        <div class="room-hero-placeholder"><i class="bi bi-building"></i></div>
+        {% endif %}
+        <div class="room-hero-overlay">
+            <h1>Habitación {{ habitacion.numero }}</h1>
+            <span class="badge bg-{% if habitacion.estado == 'disponible' %}success{% elif habitacion.estado == 'ocupada' %}danger{% else %}warning{% endif %}" style="font-size:.75rem; padding:.4rem .8rem; border-radius:2rem;">
+                {{ habitacion.get_estado_display }}
+            </span>
+        </div>
     </div>
-    {% endif %}
-    <div class="room-hero-overlay">
-        <h1>Habitación {{ habitacion.numero }}</h1>
-        <span class="badge bg-{% if habitacion.estado == 'disponible' %}success{% elif habitacion.estado == 'ocupada' %}danger{% else %}warning{% endif %} fs-6">
-            {{ habitacion.get_estado_display }}
-        </span>
-    </div>
-</div>
 
-<div class="row g-4 fade-in-up">
-    <!-- Info principal -->
-    <div class="col-lg-8">
-        <div class="card room-info-card">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-3">Detalles de la habitación</h4>
-
+    <div class="row g-4 fade-in-up">
+        <div class="col-lg-8">
+            <div class="info-card">
+                <h4 class="mb-3">Detalles de la habitación</h4>
                 <div class="info-item">
-                    <div class="info-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-tag"></i>
-                    </div>
-                    <div>
-                        <div class="info-label">Tipo</div>
-                        <div class="info-value">{{ habitacion.tipo.nombre }}</div>
-                    </div>
+                    <div class="info-icon"><i class="bi bi-tag"></i></div>
+                    <div><div class="info-label">Tipo</div><div class="info-value">{{ habitacion.tipo.nombre }}</div></div>
                 </div>
-
                 <div class="info-item">
-                    <div class="info-icon bg-success bg-opacity-10 text-success">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div>
-                        <div class="info-label">Capacidad</div>
-                        <div class="info-value">{{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</div>
-                    </div>
+                    <div class="info-icon"><i class="bi bi-people"></i></div>
+                    <div><div class="info-label">Capacidad</div><div class="info-value">{{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</div></div>
                 </div>
-
                 <div class="info-item">
-                    <div class="info-icon bg-info bg-opacity-10 text-info">
-                        <i class="bi bi-text-paragraph"></i>
-                    </div>
-                    <div>
-                        <div class="info-label">Descripción</div>
-                        <div class="info-value">{{ habitacion.descripcion|default:"Sin descripción disponible" }}</div>
-                    </div>
+                    <div class="info-icon"><i class="bi bi-text-paragraph"></i></div>
+                    <div><div class="info-label">Descripción</div><div class="info-value">{{ habitacion.descripcion|default:"Sin descripción disponible" }}</div></div>
                 </div>
-
                 <div class="info-item">
-                    <div class="info-icon bg-secondary bg-opacity-10 text-secondary">
-                        <i class="bi bi-clock"></i>
-                    </div>
-                    <div>
-                        <div class="info-label">Última actualización</div>
-                        <div class="info-value">{{ habitacion.fecha_actualizacion|date:"d/m/Y H:i" }}</div>
-                    </div>
+                    <div class="info-icon"><i class="bi bi-clock"></i></div>
+                    <div><div class="info-label">Última actualización</div><div class="info-value">{{ habitacion.fecha_actualizacion|date:"d/m/Y H:i" }}</div></div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Sidebar: Precio y acciones -->
-    <div class="col-lg-4">
-        <div class="room-price-card mb-4">
-            <div class="price-label">Precio por noche</div>
-            <div class="price">${{ habitacion.precio_por_noche }}</div>
-        </div>
-
-        <div class="d-grid gap-2">
-            {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
-            <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success btn-lg">
-                <i class="bi bi-cart-plus"></i> Reservar esta habitación
-            </a>
-            {% endif %}
-            {% if request.user.role == 'admin' %}
-            <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="btn btn-warning btn-lg">
-                <i class="bi bi-pencil"></i> Editar habitación
-            </a>
-            {% endif %}
-            <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Volver al listado
-            </a>
+        <div class="col-lg-4">
+            <div class="price-card mb-4">
+                <div class="price-label">Precio por noche</div>
+                <div class="price">${{ habitacion.precio_por_noche }}</div>
+            </div>
+            <div class="d-grid gap-2">
+                {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
+                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn-gold justify-content-center"><i class="bi bi-cart-plus"></i> Reservar esta habitación</a>
+                {% endif %}
+                {% if request.user.role == 'admin' %}
+                <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="btn-gold justify-content-center" style="background:#d97706;"><i class="bi bi-pencil"></i> Editar habitación</a>
+                {% endif %}
+                <a href="{% url 'habitaciones:habitacion_list' %}" class="btn-outline-back justify-content-center"><i class="bi bi-arrow-left"></i> Volver al listado</a>
+            </div>
         </div>
     </div>
 </div>
