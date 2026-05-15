@@ -12,7 +12,11 @@
     <div class="col-md-4 mb-3">
         <div class="card h-100">
             {% if habitacion.imagen %}
+                {% if habitacion.tiene_imagen_real %}
                 <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}">
+                {% else %}
+                <div class="card-img-placeholder"><i class="bi bi-building"></i></div>
+                {% endif %}
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
