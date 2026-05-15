@@ -3,42 +3,124 @@
 {% block title %}Reservar habitación {{ habitacion.numero }}{% endblock %}
 
 {% block content %}
-<h1>Reservar habitación {{ habitacion.numero }}</h1>
-<p class="text-muted">{{ habitacion.tipo.nombre }} · ${{ habitacion.precio_por_noche }}/noche · capacidad {{ habitacion.capacidad }}</p>
+<style>
+    .booking-card {
+        border: none;
+        border-radius: var(--hotel-radius-lg);
+        box-shadow: var(--hotel-shadow-lg);
+        overflow: hidden;
+    }
+    .booking-header {
+        background: linear-gradient(135deg, var(--hotel-dark) 0%, var(--hotel-primary) 100%);
+        padding: 1.75rem 2rem;
+        color: #fff;
+    }
+    .booking-header h2 {
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-bottom: .25rem;
+    }
+    .booking-header p {
+        opacity: .8;
+        font-size: .85rem;
+        margin-bottom: 0;
+    }
+    .booking-body {
+        padding: 2rem;
+    }
+    .room-summary {
+        background: var(--hotel-light);
+        border-radius: var(--hotel-radius);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .room-summary .room-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--hotel-primary);
+        border-radius: .75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    .room-summary .room-info strong {
+        display: block;
+        font-size: .95rem;
+        color: var(--hotel-dark);
+    }
+    .room-summary .room-info span {
+        font-size: .8rem;
+        color: var(--hotel-gray);
+    }
+</style>
 
-<div class="card">
-    <div class="card-body">
-        <form method="post" novalidate>
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
-                </div>
-            {% endif %}
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label">Fecha de entrada</label>
-                    {{ form.fecha_entrada }}
-                    {% for error in form.fecha_entrada.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">Fecha de salida</label>
-                    {{ form.fecha_salida }}
-                    {% for error in form.fecha_salida.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="{{ form.huespedes.id_for_label }}" class="form-label">Huéspedes</label>
-                    {{ form.huespedes }}
-                    {% for error in form.huespedes.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                </div>
+<div class="row justify-content-center fade-in-up">
+    <div class="col-lg-7">
+        <div class="card booking-card">
+            <div class="booking-header">
+                <h2><i class="bi bi-cart-plus"></i> Reservar habitación {{ habitacion.numero }}</h2>
+                <p>Selecciona las fechas y cantidad de huéspedes</p>
             </div>
+            <div class="booking-body">
+                <div class="room-summary">
+                    <div class="room-icon">
+                        <i class="bi bi-door-open"></i>
+                    </div>
+                    <div class="room-info">
+                        <strong>{{ habitacion.tipo.nombre }} — Hab. {{ habitacion.numero }}</strong>
+                        <span>${{ habitacion.precio_por_noche }}/noche · Capacidad {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</span>
+                    </div>
+                </div>
 
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-cart-plus"></i> Agregar al carrito
-            </button>
-            <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-secondary">Cancelar</a>
-        </form>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Fecha de entrada
+                            </label>
+                            {{ form.fecha_entrada }}
+                            {% for error in form.fecha_entrada.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Fecha de salida
+                            </label>
+                            {{ form.fecha_salida }}
+                            {% for error in form.fecha_salida.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.huespedes.id_for_label }}" class="form-label">
+                                <i class="bi bi-people"></i> Huéspedes
+                            </label>
+                            {{ form.huespedes }}
+                            {% for error in form.huespedes.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-cart-plus"></i> Agregar al carrito
+                        </button>
+                        <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-outline-secondary btn-lg">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

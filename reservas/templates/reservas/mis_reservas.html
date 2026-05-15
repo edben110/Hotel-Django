@@ -3,42 +3,111 @@
 {% block title %}Mis Reservas{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h2 class="fw-bold"><i class="bi bi-calendar-check"></i> Mis Reservas</h2>
-        <p class="text-muted">Aquí puedes ver todas tus reservas realizadas.</p>
-    </div>
+<style>
+    .reservas-header {
+        margin-bottom: 2rem;
+    }
+    .reservas-header h2 {
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--hotel-dark);
+    }
+    .reserva-card {
+        border: none;
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .reserva-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--hotel-shadow-lg);
+    }
+    .reserva-card .card-header {
+        background: #fff;
+        border-bottom: 1px solid var(--hotel-border);
+        padding: .85rem 1.25rem;
+    }
+    .reserva-card .card-header code {
+        font-size: .8rem;
+        font-weight: 700;
+        color: var(--hotel-dark);
+        background: var(--hotel-light);
+        padding: .2rem .5rem;
+        border-radius: .25rem;
+    }
+    .reserva-card .card-body {
+        padding: 1.25rem;
+    }
+    .reserva-card .reserva-info {
+        font-size: .85rem;
+        line-height: 1.8;
+    }
+    .reserva-card .reserva-info i {
+        width: 18px;
+        color: var(--hotel-gray);
+    }
+    .reserva-card .card-footer {
+        background: var(--hotel-light);
+        border-top: 1px solid var(--hotel-border);
+        padding: .85rem 1.25rem;
+    }
+    .reservas-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .reservas-empty .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--hotel-light);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .reservas-empty .empty-icon i {
+        font-size: 2.5rem;
+        color: #94a3b8;
+    }
+</style>
+
+<div class="reservas-header fade-in-up">
+    <h2><i class="bi bi-calendar-check"></i> Mis Reservas</h2>
+    <p class="text-muted mb-0">Aquí puedes ver todas tus reservas realizadas.</p>
 </div>
 
 {% if reservas %}
-<div class="row">
+<div class="row g-4 fade-in-up">
     {% for reserva in reservas %}
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 shadow-sm">
+    <div class="col-md-6 col-lg-4">
+        <div class="card reserva-card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>{{ reserva.codigo }}</strong>
+                <code>{{ reserva.codigo }}</code>
                 <span class="badge bg-{% if reserva.estado == 'confirmada' %}success{% elif reserva.estado == 'pendiente' %}warning{% elif reserva.estado == 'cancelada' %}danger{% elif reserva.estado == 'completada' %}info{% else %}secondary{% endif %}">
                     {{ reserva.get_estado_display }}
                 </span>
             </div>
             <div class="card-body">
-                <h5 class="card-title">Habitación {{ reserva.habitacion.numero }}</h5>
-                <p class="card-text">
-                    <i class="bi bi-door-open"></i> {{ reserva.habitacion.tipo.nombre }}<br>
-                    <i class="bi bi-calendar-event"></i> {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}<br>
-                    <i class="bi bi-moon"></i> {{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}<br>
-                    <i class="bi bi-people"></i> {{ reserva.huespedes }} huésped{{ reserva.huespedes|pluralize:"es" }}<br>
-                    <i class="bi bi-cash"></i> <strong>${{ reserva.total }}</strong>
-                </p>
+                <h5 class="fw-bold mb-2">Habitación {{ reserva.habitacion.numero }}</h5>
+                <div class="reserva-info">
+                    <div><i class="bi bi-door-open"></i> {{ reserva.habitacion.tipo.nombre }}</div>
+                    <div><i class="bi bi-calendar-event"></i> {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}</div>
+                    <div><i class="bi bi-moon"></i> {{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}</div>
+                    <div><i class="bi bi-people"></i> {{ reserva.huespedes }} huésped{{ reserva.huespedes|pluralize:"es" }}</div>
+                    <div class="mt-2">
+                        <span class="fw-bold text-primary fs-5">${{ reserva.total }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="card-footer bg-transparent">
+            <div class="card-footer">
                 <div class="d-flex gap-2">
                     <a href="{% url 'reservas:reserva_detail' reserva.codigo %}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-eye"></i> Ver detalles
                     </a>
                     {% if reserva.estado != 'cancelada' and reserva.estado != 'completada' %}
                     <a href="{% url 'reservas:cancelar_reserva' reserva.codigo %}" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-x-circle"></i> Cancelar reserva
+                        <i class="bi bi-x-circle"></i> Cancelar
                     </a>
                     {% endif %}
                 </div>
@@ -48,11 +117,11 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="text-center py-5">
-    <div class="mb-4">
-        <i class="bi bi-calendar-x text-muted" style="font-size: 5rem;"></i>
+<div class="reservas-empty fade-in-up">
+    <div class="empty-icon">
+        <i class="bi bi-calendar-x"></i>
     </div>
-    <h4 class="text-muted mb-3">No tienes reservas aún</h4>
+    <h4 class="fw-semibold text-muted mb-2">No tienes reservas aún</h4>
     <p class="text-muted mb-4">Explora nuestras habitaciones disponibles y realiza tu primera reserva.</p>
     <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-primary btn-lg">
         <i class="bi bi-search"></i> Buscar habitaciones

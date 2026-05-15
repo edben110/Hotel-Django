@@ -8,32 +8,375 @@
           rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
           rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --hotel-primary: #1d4ed8;
+            --hotel-primary-dark: #1e40af;
+            --hotel-accent: #0ea5e9;
+            --hotel-dark: #0f172a;
+            --hotel-gray: #64748b;
+            --hotel-light: #f8fafc;
+            --hotel-border: #e2e8f0;
+            --hotel-shadow: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 12px rgba(15, 23, 42, .04);
+            --hotel-shadow-lg: 0 4px 6px rgba(15, 23, 42, .05), 0 10px 40px rgba(15, 23, 42, .08);
+            --hotel-radius: 0.75rem;
+            --hotel-radius-lg: 1.25rem;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--hotel-light);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .hotel-navbar {
+            background: var(--hotel-dark) !important;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            padding: .75rem 0;
+            backdrop-filter: blur(12px);
+            position: relative;
+            z-index: 1030;
+            overflow: visible;
+        }
+
+        .hotel-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -.02em;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .hotel-navbar .navbar-brand .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--hotel-primary), var(--hotel-accent));
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .hotel-navbar .nav-link {
+            color: rgba(255,255,255,.7) !important;
+            font-weight: 500;
+            font-size: .875rem;
+            padding: .5rem .85rem !important;
+            border-radius: .5rem;
+            transition: all .2s ease;
+        }
+
+        .hotel-navbar .nav-link:hover,
+        .hotel-navbar .nav-link:focus {
+            color: #fff !important;
+            background: rgba(255,255,255,.08);
+        }
+
+        .hotel-navbar .dropdown-menu {
+            border: 1px solid var(--hotel-border);
+            border-radius: var(--hotel-radius);
+            box-shadow: var(--hotel-shadow-lg);
+            padding: .5rem;
+            margin-top: .5rem;
+            z-index: 1050;
+        }
+
+        .hotel-navbar .dropdown-item {
+            border-radius: .375rem;
+            padding: .5rem .75rem;
+            font-size: .875rem;
+            font-weight: 500;
+        }
+
+        .hotel-navbar .dropdown-item:hover {
+            background: var(--hotel-light);
+        }
+
+        .hotel-navbar .badge {
+            font-size: .65rem;
+            padding: .25em .5em;
+            border-radius: 999px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: 1px solid var(--hotel-border);
+            border-radius: var(--hotel-radius);
+            box-shadow: var(--hotel-shadow);
+            transition: box-shadow .2s ease, transform .2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--hotel-shadow-lg);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid var(--hotel-border);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            font-weight: 500;
+            font-size: .875rem;
+            border-radius: .5rem;
+            padding: .5rem 1rem;
+            transition: all .2s ease;
+        }
+
+        .btn-primary {
+            background: var(--hotel-primary);
+            border-color: var(--hotel-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--hotel-primary-dark);
+            border-color: var(--hotel-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, .3);
+        }
+
+        .btn-lg {
+            padding: .65rem 1.5rem;
+            font-size: .95rem;
+        }
+
+        /* ===== TABLES ===== */
+        .table {
+            font-size: .875rem;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: .75rem;
+            letter-spacing: .05em;
+            color: var(--hotel-gray);
+            border-bottom-width: 1px;
+        }
+
+        .table-dark thead th,
+        .table-dark th {
+            color: #fff;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            font-weight: 500;
+            font-size: .75rem;
+            padding: .35em .65em;
+            border-radius: .375rem;
+        }
+
+        /* ===== FORMS ===== */
+        .form-control, .form-select {
+            border: 1px solid var(--hotel-border);
+            border-radius: .5rem;
+            padding: .6rem .85rem;
+            font-size: .875rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--hotel-primary);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, .1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: .8rem;
+            color: #475569;
+            margin-bottom: .35rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            border-radius: var(--hotel-radius);
+            border: none;
+            font-size: .875rem;
+            font-weight: 500;
+        }
+
+        /* ===== FOOTER ===== */
+        .hotel-footer {
+            background: var(--hotel-dark);
+            color: rgba(255,255,255,.6);
+            padding: 2.5rem 0;
+            margin-top: auto;
+        }
+
+        .hotel-footer a {
+            color: rgba(255,255,255,.7);
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .hotel-footer a:hover {
+            color: #fff;
+        }
+
+        .hotel-footer .footer-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp .4s ease forwards;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--hotel-light);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--hotel-border);
+        }
+
+        .page-header h1, .page-header h2 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            color: var(--hotel-dark);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-content {
+                padding-top: 1.25rem;
+                padding-bottom: 2rem;
+            }
+        }
+
+        /* ===== LUXURY NAVBAR (non-authenticated) ===== */
+        .hotel-navbar-luxury {
+            background: #fff !important;
+            border-bottom: 1px solid #f0ebe3;
+            padding: 1rem 0;
+        }
+
+        .hotel-navbar-luxury .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #2c2c2c !important;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .hotel-navbar-luxury .nav-link {
+            color: #6b6b6b !important;
+            font-weight: 500;
+            font-size: .85rem;
+            padding: .5rem 1rem !important;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            transition: color .2s ease;
+        }
+
+        .hotel-navbar-luxury .nav-link:hover {
+            color: #b8860b !important;
+        }
+
+        .hotel-navbar-luxury .btn-luxury {
+            background: #b8860b;
+            color: #fff;
+            border: none;
+            border-radius: .25rem;
+            padding: .5rem 1.25rem;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            transition: all .2s ease;
+        }
+
+        .hotel-navbar-luxury .btn-luxury:hover {
+            background: #9a7209;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* ===== LUXURY FOOTER ===== */
+        .hotel-footer-luxury {
+            background: #b8860b;
+            color: rgba(255,255,255,.85);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .hotel-footer-luxury a {
+            color: rgba(255,255,255,.9);
+            text-decoration: none;
+        }
+
+        .hotel-footer-luxury a:hover {
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navbar dinámica por rol -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Navbar -->
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg hotel-navbar">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-                <i class="bi bi-building"></i> Hotel
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <span class="brand-icon"><i class="bi bi-building"></i></span>
+                Hotel
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Menú de navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-
-                {% if user.is_authenticated %}
-                {# ===== USUARIO AUTENTICADO ===== #}
                 <ul class="navbar-nav me-auto">
-                    <!-- Inicio -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">
                             <i class="bi bi-house-door"></i> Inicio
                         </a>
                     </li>
 
-                    <!-- Habitaciones Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,14 +396,12 @@
                         </ul>
                     </li>
 
-                    <!-- Mis Reservas -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">
                             <i class="bi bi-calendar-check"></i> Mis Reservas
                         </a>
                     </li>
 
-                    <!-- Carrito con contador dinámico -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'reservas:carrito_detail' %}">
                             <i class="bi bi-cart3"></i> Carrito
@@ -71,7 +412,6 @@
                     </li>
 
                     {% if user.role == 'admin' %}
-                    <!-- Administración Dropdown (solo admin) -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
@@ -94,13 +434,11 @@
                                     <i class="bi bi-tags"></i> Tipos de habitación
                                 </a>
                             </li>
-                            
                         </ul>
                     </li>
                     {% endif %}
                 </ul>
 
-                <!-- Menú derecho: Mi cuenta -->
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button"
@@ -124,41 +462,100 @@
                         </ul>
                     </li>
                 </ul>
-
-                {% else %}
-                {# ===== USUARIO NO AUTENTICADO ===== #}
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">
-                            <i class="bi bi-person-plus"></i> Registro
-                        </a>
-                    </li>
-                </ul>
-                {% endif %}
-
             </div>
         </div>
     </nav>
+    {% else %}
+    <nav class="navbar navbar-expand-lg hotel-navbar-luxury">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'login' %}">Hotel</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Habitaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Contacto</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-luxury" href="{% url 'login' %}">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-luxury" href="{% url 'register' %}" style="background:transparent;color:#b8860b;border:1px solid #b8860b;">Registro</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
 
     <!-- Contenido principal -->
-    <div class="container mt-4">
+    <div class="{% if user.is_authenticated %}container main-content{% else %}main-content{% endif %}" {% if not user.is_authenticated %}style="padding-top:0; padding-bottom:0;"{% endif %}>
         {% if messages %}
+        <div class="{% if not user.is_authenticated %}container mt-3{% endif %}">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in-up" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                             aria-label="Cerrar"></button>
                 </div>
             {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Footer -->
+    {% if user.is_authenticated %}
+    <footer class="hotel-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="footer-brand">
+                        <i class="bi bi-building"></i> Hotel
+                    </div>
+                    <p class="small mb-0 mt-1">Tu destino de confort y elegancia.</p>
+                </div>
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="small">Habitaciones</a>
+                        <a href="{% url 'reservas:buscar_reserva' %}" class="small">Consultar reserva</a>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="small mb-0">&copy; 2025 Hotel. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% else %}
+    <footer class="hotel-footer-luxury">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <p class="small mb-0" style="font-family:'Playfair Display',serif; font-weight:600; letter-spacing:.03em;">
+                    Hotel de Lujo
+                </p>
+                <p class="small mb-0">
+                    <a href="{% url 'login' %}">Inicio</a>
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'login' %}">Habitaciones</a>
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'login' %}">Contacto</a>
+                </p>
+                <p class="small mb-0">&copy; 2025 Hotel. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}

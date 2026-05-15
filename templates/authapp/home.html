@@ -7,11 +7,21 @@
 {# ===== DASHBOARD ADMINISTRATIVO ===== #}
 <style>
     .dashboard-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);
+        background: linear-gradient(135deg, var(--hotel-dark) 0%, var(--hotel-primary) 55%, var(--hotel-accent) 100%);
         color: #fff;
-        border-radius: 1.5rem;
+        border-radius: var(--hotel-radius-lg);
         overflow: hidden;
         position: relative;
+    }
+    .dashboard-hero::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -5%;
+        width: 250px;
+        height: 250px;
+        background: rgba(255,255,255,.05);
+        border-radius: 50%;
     }
     .dashboard-hero::after {
         content: '';
@@ -19,38 +29,45 @@
         inset: auto -10% -40% auto;
         width: 18rem;
         height: 18rem;
-        background: rgba(255,255,255,.08);
+        background: rgba(255,255,255,.06);
         border-radius: 999px;
     }
     .stat-card {
         border: 0;
-        border-radius: 1.25rem;
-        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--hotel-shadow-lg);
     }
     .chart-card {
         border: 0;
-        border-radius: 1.25rem;
-        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
         min-height: 100%;
     }
     .metric-value {
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 800;
+        letter-spacing: -.02em;
     }
     .section-label {
         text-transform: uppercase;
         letter-spacing: .12em;
-        font-size: .75rem;
-        color: #64748b;
+        font-size: .7rem;
+        color: rgba(255,255,255,.5);
+        font-weight: 600;
     }
 </style>
 
-<div class="dashboard-hero p-4 p-lg-5 mb-4">
+<div class="dashboard-hero p-4 p-lg-5 mb-4 fade-in-up">
     <div class="row align-items-end position-relative" style="z-index:1;">
         <div class="col-lg-8">
-            <p class="section-label text-white-50 mb-2">Panel Administrativo</p>
-            <h1 class="display-6 fw-bold mb-2">Bienvenido, {{ user.username }}</h1>
-            <p class="mb-0 text-white-75">Dashboard de reservas, ocupación y reportes del hotel.</p>
+            <p class="section-label mb-2">Panel Administrativo</p>
+            <h1 class="display-6 fw-bold mb-2" style="letter-spacing:-.03em;">Bienvenido, {{ user.username }}</h1>
+            <p class="mb-0" style="opacity:.75;">Dashboard de reservas, ocupación y reportes del hotel.</p>
         </div>
         <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
             <a class="btn btn-light btn-lg me-2" href="{% url 'reportes:reporte_reservas' %}">
@@ -221,17 +238,59 @@
 
 {% else %}
 {# ===== DASHBOARD CLIENTE ===== #}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="p-4 rounded-4 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);">
-            <h2 class="fw-bold mb-1">Bienvenido, {{ user.username }}</h2>
-            <p class="mb-0 opacity-75">Encuentra tu habitación ideal y gestiona tus reservas.</p>
-        </div>
-    </div>
+<style>
+    .client-hero {
+        background: linear-gradient(135deg, var(--hotel-dark) 0%, var(--hotel-primary) 55%, var(--hotel-accent) 100%);
+        border-radius: var(--hotel-radius-lg);
+        padding: 2.5rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .client-hero::before {
+        content: '';
+        position: absolute;
+        top: -40%;
+        right: -8%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,.05);
+        border-radius: 50%;
+    }
+    .client-hero h2 {
+        font-weight: 800;
+        letter-spacing: -.02em;
+    }
+    .quick-link-card {
+        border: none;
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .quick-link-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--hotel-shadow-lg);
+    }
+    .room-card-home {
+        border: none;
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .room-card-home:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--hotel-shadow-lg);
+    }
+</style>
+
+<div class="client-hero mb-4 fade-in-up">
+    <h2 class="mb-1">Bienvenido, {{ user.username }}</h2>
+    <p class="mb-0" style="opacity:.75;">Encuentra tu habitación ideal y gestiona tus reservas.</p>
 </div>
 
 <!-- Resumen visual -->
-<div class="row g-3 mb-4">
+<div class="row g-3 mb-4 fade-in-up">
     <div class="col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center">
@@ -261,52 +320,52 @@
 </div>
 
 <!-- Accesos rápidos -->
-<div class="row g-3 mb-4">
+<div class="row g-3 mb-4 fade-in-up">
     <div class="col-md-4">
-        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="card quick-link-card text-decoration-none h-100">
             <div class="card-body text-center py-4">
                 <i class="bi bi-search fs-1 text-primary"></i>
-                <h6 class="mt-2 mb-0 text-dark">Buscar disponibilidad</h6>
+                <h6 class="mt-2 mb-0 text-dark fw-semibold">Buscar disponibilidad</h6>
             </div>
         </a>
     </div>
     <div class="col-md-4">
-        <a href="{% url 'reservas:carrito_detail' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+        <a href="{% url 'reservas:carrito_detail' %}" class="card quick-link-card text-decoration-none h-100">
             <div class="card-body text-center py-4">
                 <i class="bi bi-cart3 fs-1 text-warning"></i>
-                <h6 class="mt-2 mb-0 text-dark">Mi carrito</h6>
+                <h6 class="mt-2 mb-0 text-dark fw-semibold">Mi carrito</h6>
             </div>
         </a>
     </div>
     <div class="col-md-4">
-        <a href="{% url 'reservas:buscar_reserva' %}" class="card border-0 shadow-sm text-decoration-none h-100">
+        <a href="{% url 'reservas:buscar_reserva' %}" class="card quick-link-card text-decoration-none h-100">
             <div class="card-body text-center py-4">
                 <i class="bi bi-receipt fs-1 text-info"></i>
-                <h6 class="mt-2 mb-0 text-dark">Consultar reserva</h6>
+                <h6 class="mt-2 mb-0 text-dark fw-semibold">Consultar reserva</h6>
             </div>
         </a>
     </div>
 </div>
 
 <!-- Habitaciones disponibles -->
-<h4 class="mb-3"><i class="bi bi-door-open"></i> Habitaciones disponibles</h4>
+<h4 class="mb-3 fw-bold"><i class="bi bi-door-open"></i> Habitaciones disponibles</h4>
 {% if habitaciones_disponibles %}
 <div class="row g-3 mb-4">
     {% for habitacion in habitaciones_disponibles %}
     <div class="col-md-6 col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card room-card-home h-100">
             {% if habitacion.imagen %}
             <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}" style="height: 180px; object-fit: cover;">
             {% else %}
-            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                <i class="bi bi-image text-muted fs-1"></i>
+            <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 180px; background: linear-gradient(135deg, #e2e8f0, #f1f5f9);">
+                <i class="bi bi-building text-muted" style="font-size: 2.5rem;"></i>
             </div>
             {% endif %}
             <div class="card-body">
-                <h6 class="card-title">Habitación {{ habitacion.numero }}</h6>
+                <h6 class="card-title fw-bold">Habitación {{ habitacion.numero }}</h6>
                 <p class="text-muted small mb-1">{{ habitacion.tipo.nombre }} · {{ habitacion.capacidad }} huésped{{ habitacion.capacidad|pluralize:"es" }}</p>
                 <p class="fw-bold text-primary mb-2">${{ habitacion.precio_por_noche }} / noche</p>
-                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-sm btn-outline-primary">
+                <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-sm btn-primary">
                     <i class="bi bi-cart-plus"></i> Reservar
                 </a>
             </div>

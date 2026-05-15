@@ -1,11 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}Registro{% endblock %}
+{% block title %}Registro - Hotel de Lujo{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="mb-4 text-center">Crear cuenta</h2>
+<style>
+    .register-section {
+        background: #faf8f5;
+        padding: 4rem 1.5rem;
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-card {
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: .75rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        padding: 2.5rem;
+        border: 1px solid #f0ebe3;
+    }
+
+    .register-card h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #2c2c2c;
+        text-align: center;
+        margin-bottom: .5rem;
+    }
+
+    .register-card .subtitle {
+        text-align: center;
+        color: #7a7a7a;
+        font-size: .85rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .register-card .form-control,
+    .register-card .form-select {
+        border: 1px solid #e8e0d5;
+        border-radius: .375rem;
+        padding: .75rem 1rem;
+        font-size: .9rem;
+        background: #faf8f5;
+    }
+
+    .register-card .form-control:focus,
+    .register-card .form-select:focus {
+        border-color: #b8860b;
+        box-shadow: 0 0 0 3px rgba(184, 134, 11, .1);
+        background: #fff;
+    }
+
+    .register-card .form-label {
+        font-weight: 500;
+        font-size: .8rem;
+        color: #6b6b6b;
+        letter-spacing: .02em;
+    }
+
+    .register-card .btn-register {
+        background: #b8860b;
+        color: #fff;
+        border: none;
+        border-radius: .375rem;
+        padding: .75rem;
+        font-size: .9rem;
+        font-weight: 600;
+        letter-spacing: .03em;
+        width: 100%;
+        transition: all .2s ease;
+    }
+
+    .register-card .btn-register:hover {
+        background: #9a7209;
+        transform: translateY(-1px);
+    }
+
+    .register-card .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+
+    .register-card .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e8e0d5;
+    }
+
+    .register-card .divider span {
+        background: #fff;
+        padding: 0 .75rem;
+        position: relative;
+        color: #999;
+        font-size: .8rem;
+    }
+</style>
+
+<section class="register-section">
+    <div class="register-card">
+        <h3>Crear Cuenta</h3>
+        <p class="subtitle">Regístrate para reservar habitaciones exclusivas</p>
 
         <form method="POST" novalidate>
             {% csrf_token %}
@@ -24,13 +128,17 @@
                 </div>
             {% endfor %}
 
-            <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+            <button type="submit" class="btn-register mt-2">Registrarse</button>
         </form>
 
-        <hr>
-        <p class="text-center mb-0">
-            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a>
+        <div class="divider">
+            <span>o</span>
+        </div>
+
+        <p class="text-center mb-0" style="font-size:.85rem; color:#7a7a7a;">
+            ¿Ya tienes cuenta?
+            <a href="{% url 'login' %}" style="color:#b8860b; font-weight:600; text-decoration:none;">Inicia sesión aquí</a>
         </p>
     </div>
-</div>
+</section>
 {% endblock %}

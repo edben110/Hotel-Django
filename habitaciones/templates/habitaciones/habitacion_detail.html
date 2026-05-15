@@ -3,60 +3,192 @@
 {% block title %}Habitación {{ habitacion.numero }}{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
+<style>
+    .room-hero {
+        border-radius: var(--hotel-radius-lg);
+        overflow: hidden;
+        position: relative;
+        height: 300px;
+        background: linear-gradient(135deg, #1e293b, #334155);
+        margin-bottom: 2rem;
+    }
+    .room-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .room-hero-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        background: linear-gradient(transparent, rgba(15, 23, 42, .85));
+        color: #fff;
+    }
+    .room-hero-overlay h1 {
+        font-weight: 800;
+        font-size: 2rem;
+        margin-bottom: .25rem;
+    }
+    .room-hero-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e2e8f0, #f1f5f9);
+    }
+    .room-hero-placeholder i {
+        font-size: 4rem;
+        color: #94a3b8;
+    }
+    .room-info-card {
+        border: none;
+        border-radius: var(--hotel-radius-lg);
+        box-shadow: var(--hotel-shadow-lg);
+    }
+    .room-info-card .info-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--hotel-border);
+    }
+    .room-info-card .info-item:last-child {
+        border-bottom: none;
+    }
+    .room-info-card .info-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: .625rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .room-info-card .info-label {
+        font-size: .75rem;
+        color: var(--hotel-gray);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 600;
+    }
+    .room-info-card .info-value {
+        font-weight: 600;
+        color: var(--hotel-dark);
+        font-size: .95rem;
+    }
+    .room-price-card {
+        border: none;
+        border-radius: var(--hotel-radius-lg);
+        box-shadow: var(--hotel-shadow-lg);
+        background: linear-gradient(135deg, var(--hotel-primary), var(--hotel-accent));
+        color: #fff;
+        text-align: center;
+        padding: 2rem;
+    }
+    .room-price-card .price {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+    .room-price-card .price-label {
+        font-size: .85rem;
+        opacity: .8;
+    }
+</style>
+
+<!-- Hero Image -->
+<div class="room-hero fade-in-up">
+    {% if habitacion.imagen %}
+    <img src="{{ habitacion.imagen.url }}" alt="Habitación {{ habitacion.numero }}">
+    {% else %}
+    <div class="room-hero-placeholder">
+        <i class="bi bi-image"></i>
+    </div>
+    {% endif %}
+    <div class="room-hero-overlay">
         <h1>Habitación {{ habitacion.numero }}</h1>
-        <div class="card">
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Tipo:</dt>
-                    <dd class="col-sm-8">{{ habitacion.tipo.nombre }}</dd>
+        <span class="badge bg-{% if habitacion.estado == 'disponible' %}success{% elif habitacion.estado == 'ocupada' %}danger{% else %}warning{% endif %} fs-6">
+            {{ habitacion.get_estado_display }}
+        </span>
+    </div>
+</div>
 
-                    <dt class="col-sm-4">Capacidad:</dt>
-                    <dd class="col-sm-8">{{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</dd>
+<div class="row g-4 fade-in-up">
+    <!-- Info principal -->
+    <div class="col-lg-8">
+        <div class="card room-info-card">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3">Detalles de la habitación</h4>
 
-                    <dt class="col-sm-4">Precio por noche:</dt>
-                    <dd class="col-sm-8">${{ habitacion.precio_por_noche }}</dd>
+                <div class="info-item">
+                    <div class="info-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div>
+                        <div class="info-label">Tipo</div>
+                        <div class="info-value">{{ habitacion.tipo.nombre }}</div>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Estado:</dt>
-                    <dd class="col-sm-8">
-                        <span class="badge bg-{% if habitacion.estado == 'disponible' %}success{% elif habitacion.estado == 'ocupada' %}danger{% else %}warning{% endif %}">
-                            {{ habitacion.get_estado_display }}
-                        </span>
-                    </dd>
+                <div class="info-item">
+                    <div class="info-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div>
+                        <div class="info-label">Capacidad</div>
+                        <div class="info-value">{{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</div>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Descripción:</dt>
-                    <dd class="col-sm-8">{{ habitacion.descripcion|default:"Sin descripción" }}</dd>
+                <div class="info-item">
+                    <div class="info-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-text-paragraph"></i>
+                    </div>
+                    <div>
+                        <div class="info-label">Descripción</div>
+                        <div class="info-value">{{ habitacion.descripcion|default:"Sin descripción disponible" }}</div>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Creada:</dt>
-                    <dd class="col-sm-8">{{ habitacion.fecha_creacion|date:"d/m/Y H:i" }}</dd>
-
-                    <dt class="col-sm-4">Última actualización:</dt>
-                    <dd class="col-sm-8">{{ habitacion.fecha_actualizacion|date:"d/m/Y H:i" }}</dd>
-                </dl>
+                <div class="info-item">
+                    <div class="info-icon bg-secondary bg-opacity-10 text-secondary">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div>
+                        <div class="info-label">Última actualización</div>
+                        <div class="info-value">{{ habitacion.fecha_actualizacion|date:"d/m/Y H:i" }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    {% if habitacion.imagen %}
-    <div class="col-md-4">
-        <img src="{{ habitacion.imagen.url }}" class="img-fluid rounded" alt="Habitación {{ habitacion.numero }}">
-    </div>
-    {% endif %}
-</div>
 
-<div class="mt-3">
-    {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
-    <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success">
-        <i class="bi bi-cart-plus"></i> Reservar esta habitación
-    </a>
-    {% endif %}
-    {% if request.user.role == 'admin' %}
-    <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="btn btn-warning">
-        <i class="bi bi-pencil"></i> Editar
-    </a>
-    {% endif %}
-    <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
+    <!-- Sidebar: Precio y acciones -->
+    <div class="col-lg-4">
+        <div class="room-price-card mb-4">
+            <div class="price-label">Precio por noche</div>
+            <div class="price">${{ habitacion.precio_por_noche }}</div>
+        </div>
+
+        <div class="d-grid gap-2">
+            {% if request.user.role == 'cliente' and habitacion.estado == 'disponible' %}
+            <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}" class="btn btn-success btn-lg">
+                <i class="bi bi-cart-plus"></i> Reservar esta habitación
+            </a>
+            {% endif %}
+            {% if request.user.role == 'admin' %}
+            <a href="{% url 'habitaciones:habitacion_update' habitacion.pk %}" class="btn btn-warning btn-lg">
+                <i class="bi bi-pencil"></i> Editar habitación
+            </a>
+            {% endif %}
+            <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al listado
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

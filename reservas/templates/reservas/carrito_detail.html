@@ -3,15 +3,79 @@
 {% block title %}Tu carrito{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h2 class="fw-bold"><i class="bi bi-cart3"></i> Tu carrito de reservas</h2>
-        <p class="text-muted">Revisa las habitaciones seleccionadas antes de proceder al pago.</p>
-    </div>
+<style>
+    .cart-header {
+        margin-bottom: 1.5rem;
+    }
+    .cart-header h2 {
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--hotel-dark);
+    }
+    .cart-table-card {
+        border: none;
+        border-radius: var(--hotel-radius-lg);
+        box-shadow: var(--hotel-shadow-lg);
+        overflow: hidden;
+    }
+    .cart-table-card .table {
+        margin-bottom: 0;
+    }
+    .cart-table-card .table thead th {
+        background: var(--hotel-dark);
+        color: #fff;
+        font-weight: 600;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        padding: .85rem 1rem;
+        border: none;
+    }
+    .cart-table-card .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-color: var(--hotel-border);
+    }
+    .cart-total-row {
+        background: var(--hotel-light);
+    }
+    .cart-total-row td {
+        padding: 1.25rem 1rem !important;
+    }
+    .cart-empty {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .cart-empty .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--hotel-light);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .cart-empty .empty-icon i {
+        font-size: 2.5rem;
+        color: #94a3b8;
+    }
+    .cart-actions {
+        background: #fff;
+        border-radius: var(--hotel-radius);
+        padding: 1.25rem;
+        border: 1px solid var(--hotel-border);
+        margin-top: 1.5rem;
+    }
+</style>
+
+<div class="cart-header fade-in-up">
+    <h2><i class="bi bi-cart3"></i> Tu carrito de reservas</h2>
+    <p class="text-muted mb-0">Revisa las habitaciones seleccionadas antes de proceder al pago.</p>
 </div>
 
 {% if avisos %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show fade-in-up" role="alert">
         <strong><i class="bi bi-exclamation-triangle"></i> Hay problemas con tu reserva:</strong>
         <ul class="mb-0 mt-2">
             {% for item, mensaje in avisos %}
@@ -23,21 +87,20 @@
 {% endif %}
 
 {% if items %}
-<!-- Tabla del carrito -->
-<div class="card border-0 shadow-sm mb-4">
+<div class="cart-table-card fade-in-up">
     <div class="table-responsive">
-        <table class="table mb-0 align-middle">
-            <thead class="table-dark">
+        <table class="table">
+            <thead>
                 <tr>
-                    <th style="width: 80px;">Imagen</th>
+                    <th style="width: 70px;"></th>
                     <th>Habitación</th>
-                    <th>Fecha entrada</th>
-                    <th>Fecha salida</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
                     <th class="text-center">Noches</th>
                     <th class="text-center">Huéspedes</th>
                     <th class="text-end">Precio/Noche</th>
                     <th class="text-end">Subtotal</th>
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center" style="width: 60px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -46,15 +109,15 @@
                     <td>
                         {% if item.habitacion.imagen %}
                         <img src="{{ item.habitacion.imagen.url }}" alt="Habitación {{ item.habitacion.numero }}"
-                             class="rounded" style="width: 60px; height: 45px; object-fit: cover;">
+                             class="rounded" style="width: 55px; height: 42px; object-fit: cover;">
                         {% else %}
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 45px;">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 55px; height: 42px;">
                             <i class="bi bi-image text-muted"></i>
                         </div>
                         {% endif %}
                     </td>
                     <td>
-                        <strong>{{ item.habitacion.numero }}</strong><br>
+                        <strong class="d-block">{{ item.habitacion.numero }}</strong>
                         <small class="text-muted">{{ item.habitacion.tipo.nombre }}</small>
                     </td>
                     <td>{{ item.fecha_entrada|date:"d/m/Y" }}</td>
@@ -66,7 +129,7 @@
                     <td class="text-center">
                         <form method="post" action="{% url 'reservas:carrito_quitar' item.habitacion.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar del carrito">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -74,8 +137,8 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot class="table-light">
-                <tr>
+            <tfoot>
+                <tr class="cart-total-row">
                     <td colspan="7" class="text-end fw-bold fs-5">Total:</td>
                     <td class="text-end fw-bold fs-5 text-primary">${{ total }}</td>
                     <td></td>
@@ -85,8 +148,8 @@
     </div>
 </div>
 
-<!-- Acciones del carrito -->
-<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+<!-- Acciones -->
+<div class="cart-actions d-flex flex-wrap gap-2 justify-content-between align-items-center fade-in-up">
     <div class="d-flex gap-2">
         {% if not avisos %}
         <a href="{% url 'reservas:checkout' %}" class="btn btn-primary btn-lg">
@@ -107,11 +170,11 @@
 
 {% else %}
 <!-- Carrito vacío -->
-<div class="text-center py-5">
-    <div class="mb-4">
-        <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+<div class="cart-empty fade-in-up">
+    <div class="empty-icon">
+        <i class="bi bi-cart-x"></i>
     </div>
-    <h4 class="text-muted mb-3">Tu carrito está vacío</h4>
+    <h4 class="fw-semibold text-muted mb-2">Tu carrito está vacío</h4>
     <p class="text-muted mb-4">Explora nuestras habitaciones disponibles y comienza a planificar tu estadía.</p>
     <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-primary btn-lg">
         <i class="bi bi-search"></i> Ver habitaciones disponibles

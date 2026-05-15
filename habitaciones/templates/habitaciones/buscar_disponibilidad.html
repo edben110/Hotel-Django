@@ -3,88 +3,218 @@
 {% block title %}Buscar Disponibilidad{% endblock %}
 
 {% block content %}
-<h1>Buscar Habitaciones Disponibles</h1>
+<style>
+    .search-hero {
+        background: linear-gradient(135deg, var(--hotel-dark) 0%, var(--hotel-primary) 60%, var(--hotel-accent) 100%);
+        border-radius: var(--hotel-radius-lg);
+        padding: 2.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .search-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,.05);
+        border-radius: 50%;
+    }
+    .search-hero h1 {
+        font-weight: 800;
+        font-size: 1.75rem;
+        margin-bottom: .5rem;
+    }
+    .search-hero p {
+        opacity: .85;
+        margin-bottom: 0;
+        font-size: .95rem;
+    }
+    .search-form-card {
+        border: none;
+        border-radius: var(--hotel-radius-lg);
+        box-shadow: var(--hotel-shadow-lg);
+        margin-top: -1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    .search-form-card .card-body {
+        padding: 1.75rem;
+    }
+    .result-card {
+        border: none;
+        border-radius: var(--hotel-radius);
+        box-shadow: var(--hotel-shadow);
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--hotel-shadow-lg);
+    }
+    .result-card .card-img-placeholder {
+        height: 160px;
+        background: linear-gradient(135deg, #e2e8f0, #f1f5f9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .result-card .card-img-placeholder i {
+        font-size: 2.5rem;
+        color: #94a3b8;
+    }
+    .result-card .price-tag {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--hotel-primary);
+    }
+    .result-card .price-tag small {
+        font-weight: 400;
+        font-size: .75rem;
+        color: var(--hotel-gray);
+    }
+    .result-card .room-features {
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+        margin-top: .5rem;
+    }
+    .result-card .room-features span {
+        font-size: .75rem;
+        color: var(--hotel-gray);
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+</style>
 
-<div class="card mb-4">
+<div class="search-hero fade-in-up">
+    <h1><i class="bi bi-search"></i> Buscar Disponibilidad</h1>
+    <p>Encuentra la habitación perfecta para tu estadía</p>
+</div>
+
+<div class="card search-form-card fade-in-up">
     <div class="card-body">
         <form method="get" novalidate>
             {% if form.non_field_errors %}
                 <div class="alert alert-danger">
                     {% for error in form.non_field_errors %}
-                        <p>{{ error }}</p>
+                        <p class="mb-0">{{ error }}</p>
                     {% endfor %}
                 </div>
             {% endif %}
 
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label">Fecha de Entrada</label>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="{{ form.fecha_entrada.id_for_label }}" class="form-label">
+                        <i class="bi bi-calendar-event"></i> Fecha de Entrada
+                    </label>
                     {{ form.fecha_entrada }}
                     {% if form.fecha_entrada.errors %}
-                        <div class="invalid-feedback d-block">
+                        <div class="text-danger small mt-1">
                             {% for error in form.fecha_entrada.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">Fecha de Salida</label>
+                <div class="col-md-3">
+                    <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">
+                        <i class="bi bi-calendar-event"></i> Fecha de Salida
+                    </label>
                     {{ form.fecha_salida }}
                     {% if form.fecha_salida.errors %}
-                        <div class="invalid-feedback d-block">
+                        <div class="text-danger small mt-1">
                             {% for error in form.fecha_salida.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
+                <div class="col-md-2">
+                    <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                        <i class="bi bi-tag"></i> Tipo
+                    </label>
                     {{ form.tipo }}
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label for="{{ form.capacidad_minima.id_for_label }}" class="form-label">Capacidad Mínima</label>
+                <div class="col-md-2">
+                    <label for="{{ form.capacidad_minima.id_for_label }}" class="form-label">
+                        <i class="bi bi-people"></i> Capacidad
+                    </label>
                     {{ form.capacidad_minima }}
                 </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
             </div>
-
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-search"></i> Buscar
-            </button>
         </form>
     </div>
 </div>
 
 {% if habitaciones is not None %}
-    <h2>Resultados</h2>
-    {% if habitaciones %}
-        <div class="row">
-            {% for habitacion in habitaciones %}
-            <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
-                        <p class="card-text">
-                            <strong>Tipo:</strong> {{ habitacion.tipo.nombre }}<br>
-                            <strong>Capacidad:</strong> {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}<br>
-                            <strong>Precio:</strong> ${{ habitacion.precio_por_noche }}/noche
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-sm btn-outline-primary">
-                            Ver detalles
-                        </a>
-                        {% if request.user.is_authenticated and request.user.role == 'cliente' %}
-                        <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}?fecha_entrada={{ form.fecha_entrada.value|default:'' }}&fecha_salida={{ form.fecha_salida.value|default:'' }}" class="btn btn-sm btn-success">
-                            <i class="bi bi-cart-plus"></i> Reservar
-                        </a>
+    <div class="mt-4 fade-in-up">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">
+                <i class="bi bi-grid-3x3-gap"></i> Resultados
+            </h4>
+            {% if habitaciones %}
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                {{ habitaciones|length }} habitación{{ habitaciones|length|pluralize:"es" }} encontrada{{ habitaciones|length|pluralize:"s" }}
+            </span>
+            {% endif %}
+        </div>
+
+        {% if habitaciones %}
+            <div class="row g-4">
+                {% for habitacion in habitaciones %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card result-card h-100">
+                        {% if habitacion.imagen %}
+                        <img src="{{ habitacion.imagen.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}" style="height: 160px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-placeholder">
+                            <i class="bi bi-building"></i>
+                        </div>
                         {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold mb-0">Habitación {{ habitacion.numero }}</h5>
+                                <span class="badge bg-success bg-opacity-10 text-success">Disponible</span>
+                            </div>
+                            <p class="text-muted small mb-2">{{ habitacion.tipo.nombre }}</p>
+                            <div class="room-features">
+                                <span><i class="bi bi-people-fill"></i> {{ habitacion.capacidad }} persona{{ habitacion.capacidad|pluralize:"s" }}</span>
+                            </div>
+                            <div class="mt-auto pt-3 d-flex justify-content-between align-items-center">
+                                <div class="price-tag">
+                                    ${{ habitacion.precio_por_noche }} <small>/ noche</small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'habitaciones:habitacion_detail' habitacion.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if request.user.is_authenticated and request.user.role == 'cliente' %}
+                                    <a href="{% url 'reservas:agregar_al_carrito' habitacion.pk %}?fecha_entrada={{ form.fecha_entrada.value|default:'' }}&fecha_salida={{ form.fecha_salida.value|default:'' }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cart-plus"></i> Reservar
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> No se encontraron habitaciones disponibles para los criterios seleccionados.
-        </div>
-    {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-emoji-frown text-muted" style="font-size: 3.5rem;"></i>
+                </div>
+                <h5 class="text-muted">No se encontraron habitaciones</h5>
+                <p class="text-muted small">Intenta con otras fechas o criterios de búsqueda.</p>
+            </div>
+        {% endif %}
+    </div>
 {% endif %}
 {% endblock %}
