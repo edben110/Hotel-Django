@@ -82,6 +82,7 @@ CSRF_TRUSTED_ORIGINS = _csv_env(
 FRONTEND_URL = config('FRONTEND_URL', default='')
 API_URL = config('API_URL', default='')
 BACKEND_URL = config('BACKEND_URL', default='')
+SITE_URL = config('SITE_URL', default=BACKEND_URL)
 for trusted_origin in (
     FRONTEND_URL,
     BACKEND_URL,
@@ -110,7 +111,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'authapp',
+    'authapp.apps.AuthappConfig',
     'habitaciones',
     'reservas',
     'reportes',
@@ -245,6 +246,9 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=5, cast=int)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 EMAIL_SUBJECT_PREFIX = config('EMAIL_SUBJECT_PREFIX', default='[Hotel] ')
+ENABLE_EMAIL_RETRY_WORKER = config('ENABLE_EMAIL_RETRY_WORKER', default=False, cast=bool)
+EMAIL_RETRY_INTERVAL_SECONDS = config('EMAIL_RETRY_INTERVAL_SECONDS', default=300, cast=int)
+EMAIL_RETRY_BATCH_SIZE = config('EMAIL_RETRY_BATCH_SIZE', default=20, cast=int)
 
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
 

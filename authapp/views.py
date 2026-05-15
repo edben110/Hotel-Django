@@ -27,7 +27,7 @@ def register_view(request):
                 ).latest('created_at')
 
                 # Enviar correo de verificación
-                if not send_verification_email(request, user, token):
+                if not send_verification_email(user, token, request=request):
                     messages.warning(
                         request,
                         'Tu cuenta fue creada, pero no pudimos enviar el correo de verificación. '
