@@ -7,7 +7,17 @@
     .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
     .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
     .page-wrapper > * { position:relative; z-index:1; }
-    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; }
+    @media(max-width:768px) {
+        .page-wrapper { padding: 1.5rem 1rem 3rem; }
+        .page-header-card { padding: 1.5rem; border-radius: 1.25rem; }
+        .page-header-card h1 { font-size: 1.3rem; }
+    }
+    @media(max-width:576px) {
+        .page-wrapper { padding: 1rem .75rem 2.5rem; }
+        .page-header-card { padding: 1.25rem; }
+        .page-header-card h1 { font-size: 1.15rem; }
+    } }
 
     .booking-card { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; max-width:650px; margin:0 auto; }
     .booking-header { background:linear-gradient(145deg,#1a1a1a,#2c2c2c); padding:1.75rem 2rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }

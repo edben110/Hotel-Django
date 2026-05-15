@@ -217,8 +217,8 @@
         }
 
         .split-left {
-            height: 45vh;
-            min-height: 280px;
+            height: 40vh;
+            min-height: 250px;
         }
 
         .split-right {
@@ -228,7 +228,7 @@
         }
 
         .split-left-overlay {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .split-left-overlay h1 {
@@ -237,6 +237,37 @@
 
         .split-left-features {
             display: none;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .split-left {
+            height: 30vh;
+            min-height: 200px;
+        }
+
+        .split-right {
+            padding: 2rem 1.25rem 3.5rem;
+        }
+
+        .split-right-inner {
+            max-width: 100%;
+        }
+
+        .split-right h2 {
+            font-size: 1.3rem;
+        }
+
+        .split-left-overlay h1 {
+            font-size: 1.6rem;
+        }
+
+        .split-left-overlay p {
+            font-size: .82rem;
+        }
+
+        .split-brand svg {
+            height: 34px;
         }
     }
 </style>

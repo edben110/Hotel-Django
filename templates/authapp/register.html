@@ -234,7 +234,7 @@
         }
 
         .split-left-overlay {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .split-left-overlay h1 {
@@ -243,6 +243,33 @@
 
         .split-left-features {
             display: none;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .split-left {
+            height: 25vh;
+            min-height: 180px;
+        }
+
+        .split-right {
+            padding: 1.75rem 1.25rem 3.5rem;
+        }
+
+        .split-right-inner {
+            max-width: 100%;
+        }
+
+        .split-right h2 {
+            font-size: 1.3rem;
+        }
+
+        .split-left-overlay h1 {
+            font-size: 1.5rem;
+        }
+
+        .split-brand svg {
+            height: 34px;
         }
     }
 </style>

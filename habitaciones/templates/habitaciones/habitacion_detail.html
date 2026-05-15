@@ -13,7 +13,17 @@
     }
     .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
     .page-wrapper > * { position:relative; z-index:1; }
-    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; }
+    @media(max-width:768px) {
+        .page-wrapper { padding: 1.5rem 1rem 3rem; }
+        .page-header-card { padding: 1.5rem; border-radius: 1.25rem; }
+        .page-header-card h1 { font-size: 1.3rem; }
+    }
+    @media(max-width:576px) {
+        .page-wrapper { padding: 1rem .75rem 2.5rem; }
+        .page-header-card { padding: 1.25rem; }
+        .page-header-card h1 { font-size: 1.15rem; }
+    } }
 
     .room-hero {
         border-radius: 1.5rem;
