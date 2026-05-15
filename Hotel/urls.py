@@ -24,4 +24,8 @@ urlpatterns = [
     path('auth/', include('authapp.urls')),
     path('habitaciones/', include('habitaciones.urls')),
     path('reservas/', include('reservas.urls')),
+<<<<<<< HEAD
+    path('reportes/', include('reportes.urls')),
+=======
+>>>>>>> 486636cb96bb6b50238973b83959eff8a789992f
 ]

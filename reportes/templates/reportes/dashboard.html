@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Administrativo{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);
+        color: #fff;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        position: relative;
+    }
+    .dashboard-hero::after {
+        content: '';
+        position: absolute;
+        inset: auto -10% -40% auto;
+        width: 18rem;
+        height: 18rem;
+        background: rgba(255,255,255,.08);
+        border-radius: 999px;
+    }
+    .stat-card {
+        border: 0;
+        border-radius: 1.25rem;
+        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+    }
+    .chart-card {
+        border: 0;
+        border-radius: 1.25rem;
+        box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, .08);
+        min-height: 100%;
+    }
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    .section-label {
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        font-size: .75rem;
+        color: #64748b;
+    }
+</style>
+
+<div class="dashboard-hero p-4 p-lg-5 mb-4">
+    <div class="row align-items-end position-relative" style="z-index:1;">
+        <div class="col-lg-8">
+            <p class="section-label text-white-50 mb-2">Panel Administrativo</p>
+            <h1 class="display-6 fw-bold mb-2">Dashboard de reservas, ocupación y reportes</h1>
+            <p class="mb-0 text-white-75">Datos reales consumidos desde la base existente de habitaciones y reservas.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a class="btn btn-light btn-lg me-2" href="{% url 'reportes:reporte_reservas' %}">Ver reportes</a>
+            <a class="btn btn-outline-light btn-lg" href="{% url 'reportes:reporte_clientes' %}">Clientes</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Clientes</div>
+                <div class="metric-value">{{ metricas.total_clientes }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Habitaciones</div>
+                <div class="metric-value">{{ metricas.total_habitaciones }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Reservas</div>
+                <div class="metric-value">{{ metricas.total_reservas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Reservas activas</div>
+                <div class="metric-value">{{ metricas.reservas_activas }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Disponibles</div>
+                <div class="metric-value">{{ metricas.habitaciones_disponibles }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Ocupación general</div>
+                <div class="metric-value">{{ metricas.tasa_ocupacion_general }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Últimas reservas</h5>
+            <div class="list-group list-group-flush">
+                {% for reserva in actividad.reservas_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="fw-semibold">{{ reserva.nombre_cliente }}</div>
+                                <div class="text-muted small">{{ reserva.habitacion.numero }} · {{ reserva.get_estado_display }}</div>
+                            </div>
+                            <div class="text-muted small">{{ reserva.fecha_creacion|date:'d/m/Y H:i' }}</div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin reservas recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Últimos clientes</h5>
+            <div class="list-group list-group-flush">
+                {% for cliente in actividad.clientes_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="fw-semibold">{{ cliente.nombre_cliente }}</div>
+                        <div class="text-muted small">{{ cliente.email_cliente }}</div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin clientes recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Cambios recientes</h5>
+            <div class="list-group list-group-flush">
+                {% for habitacion in actividad.cambios_recientes %}
+                    <div class="list-group-item px-0">
+                        <div class="fw-semibold">Habitación {{ habitacion.numero }}</div>
+                        <div class="text-muted small">Actualizada {{ habitacion.fecha_actualizacion|date:'d/m/Y H:i' }}</div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted">Sin cambios recientes.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Reservas por mes</h5>
+            <canvas id="chartReservasMes" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Ocupación por mes</h5>
+            <canvas id="chartOcupacionMes" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Habitación más reservada</h5>
+            <canvas id="chartHabitaciones" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Estado de reservas</h5>
+            <canvas id="chartEstados" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card p-3">
+            <h5 class="mb-3">Clientes con más reservas</h5>
+            <canvas id="chartClientes" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const dashboardDataUrl = "{{ dashboard_data_url }}";
+
+    const buildChart = (canvasId, config) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        new Chart(canvas, config);
+    };
+
+    fetch(dashboardDataUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            buildChart('chartReservasMes', {
+                type: 'line',
+                data: {
+                    labels: data.reservas_por_mes.labels,
+                    datasets: [{
+                        label: 'Reservas',
+                        data: data.reservas_por_mes.values,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, .15)',
+                        tension: .35,
+                        fill: true,
+                    }],
+                },
+                options: {responsive: true, plugins: {legend: {display: false}}},
+            });
+
+            buildChart('chartOcupacionMes', {
+                type: 'bar',
+                data: {
+                    labels: data.ocupacion_por_mes.labels,
+                    datasets: [{
+                        label: 'Ocupación %',
+                        data: data.ocupacion_por_mes.values,
+                        backgroundColor: '#0f766e',
+                        borderRadius: 10,
+                    }],
+                },
+                options: {responsive: true, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, max: 100}}},
+            });
+
+            buildChart('chartHabitaciones', {
+                type: 'doughnut',
+                data: {
+                    labels: data.habitaciones_mas_reservadas.labels,
+                    datasets: [{
+                        data: data.habitaciones_mas_reservadas.values,
+                        backgroundColor: ['#1d4ed8', '#0ea5e9', '#14b8a6', '#f59e0b', '#ef4444'],
+                    }],
+                },
+                options: {responsive: true},
+            });
+
+            buildChart('chartEstados', {
+                type: 'pie',
+                data: {
+                    labels: data.estado_reservas.labels,
+                    datasets: [{
+                        data: data.estado_reservas.values,
+                        backgroundColor: ['#f59e0b', '#2563eb', '#ef4444', '#16a34a'],
+                    }],
+                },
+                options: {responsive: true},
+            });
+
+            buildChart('chartClientes', {
+                type: 'bar',
+                data: {
+                    labels: data.clientes_mas_reservas.labels,
+                    datasets: [{
+                        label: 'Reservas',
+                        data: data.clientes_mas_reservas.values,
+                        backgroundColor: '#7c3aed',
+                        borderRadius: 10,
+                    }],
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {legend: {display: false}},
+                },
+            });
+        });
+</script>
+{% endblock %}
