@@ -3,8 +3,10 @@ from __future__ import annotations
 from io import BytesIO
 
 import pandas as pd
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from reportlab.lib import colors
@@ -25,7 +27,18 @@ from .services import (
 )
 
 
+def _es_admin(request):
+    """Verifica si el usuario es admin. Redirige con mensaje si no lo es."""
+    if request.user.role != 'admin':
+        messages.error(request, 'No tienes permisos para acceder a esta sección.')
+        return False
+    return True
+
+
+@login_required
 def dashboard(request):
+    if not _es_admin(request):
+        return redirect('home')
     return render(request, 'reportes/dashboard.html', {
         'metricas': obtener_metricas_dashboard(),
         'actividad': obtener_actividad_reciente(),
@@ -33,11 +46,17 @@ def dashboard(request):
     })
 
 
+@login_required
 def dashboard_data(request):
+    if not _es_admin(request):
+        return redirect('home')
     return JsonResponse(obtener_datos_dashboard())
 
 
+@login_required
 def reporte_reservas(request):
+    if not _es_admin(request):
+        return redirect('home')
     form = FiltrosReporteForm(request.GET or None)
     reservas = Reserva.objects.select_related('habitacion__tipo', 'pago')
     if form.is_valid():
@@ -56,7 +75,10 @@ def reporte_reservas(request):
     })
 
 
+@login_required
 def reporte_clientes(request):
+    if not _es_admin(request):
+        return redirect('home')
     form = FiltrosReporteForm(request.GET or None)
     reservas = Reserva.objects.select_related('habitacion__tipo', 'pago')
     if form.is_valid():
@@ -75,7 +97,10 @@ def reporte_clientes(request):
     })
 
 
+@login_required
 def reporte_habitaciones(request):
+    if not _es_admin(request):
+        return redirect('home')
     form = FiltrosReporteForm(request.GET or None)
     habitaciones = Habitacion.objects.select_related('tipo').prefetch_related('reservas')
     reservas = Reserva.objects.select_related('habitacion__tipo')
@@ -111,7 +136,10 @@ def reporte_habitaciones(request):
     })
 
 
+@login_required
 def exportar_reservas_pdf(request):
+    if not _es_admin(request):
+        return redirect('home')
     reservas = _filtrar_reservas_request(request)
     filas = [
         [
@@ -132,7 +160,10 @@ def exportar_reservas_pdf(request):
     return _generar_pdf('Reporte de Reservas', encabezados, filas, 'reporte_reservas.pdf')
 
 
+@login_required
 def exportar_reservas_excel(request):
+    if not _es_admin(request):
+        return redirect('home')
     reservas = _filtrar_reservas_request(request)
     dataframe = pd.DataFrame([
         {
@@ -152,7 +183,10 @@ def exportar_reservas_excel(request):
     return _generar_excel(dataframe, 'reporte_reservas.xlsx')
 
 
+@login_required
 def exportar_clientes_pdf(request):
+    if not _es_admin(request):
+        return redirect('home')
     filas = construir_filas_clientes(_filtrar_reservas_request(request))
     encabezados = ['Cliente', 'Email', 'Total reservas', 'Total gastado', 'Primera reserva', 'Última reserva']
     tabla = [
@@ -169,7 +203,10 @@ def exportar_clientes_pdf(request):
     return _generar_pdf('Reporte de Clientes', encabezados, tabla, 'reporte_clientes.pdf')
 
 
+@login_required
 def exportar_clientes_excel(request):
+    if not _es_admin(request):
+        return redirect('home')
     filas = construir_filas_clientes(_filtrar_reservas_request(request))
     dataframe = pd.DataFrame([{
         'cliente': fila['nombre_cliente'],
@@ -182,7 +219,10 @@ def exportar_clientes_excel(request):
     return _generar_excel(dataframe, 'reporte_clientes.xlsx')
 
 
+@login_required
 def exportar_habitaciones_pdf(request):
+    if not _es_admin(request):
+        return redirect('home')
     filas = _filas_habitaciones(_filtrar_reservas_request(request))
     encabezados = ['Habitación', 'Tipo', 'Estado', 'Capacidad', 'Precio/Noche', 'Reservas']
     tabla = [
@@ -199,7 +239,10 @@ def exportar_habitaciones_pdf(request):
     return _generar_pdf('Reporte de Habitaciones', encabezados, tabla, 'reporte_habitaciones.pdf')
 
 
+@login_required
 def exportar_habitaciones_excel(request):
+    if not _es_admin(request):
+        return redirect('home')
     filas = _filas_habitaciones(_filtrar_reservas_request(request))
     dataframe = pd.DataFrame([{
         'habitacion': fila['habitacion'].numero,

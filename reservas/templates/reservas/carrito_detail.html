@@ -3,48 +3,70 @@
 {% block title %}Tu carrito{% endblock %}
 
 {% block content %}
-<h1><i class="bi bi-cart"></i> Tu carrito</h1>
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="fw-bold"><i class="bi bi-cart3"></i> Tu carrito de reservas</h2>
+        <p class="text-muted">Revisa las habitaciones seleccionadas antes de proceder al pago.</p>
+    </div>
+</div>
 
 {% if avisos %}
-    <div class="alert alert-warning">
-        <strong>Hay problemas con tu reserva:</strong>
-        <ul class="mb-0">
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong><i class="bi bi-exclamation-triangle"></i> Hay problemas con tu reserva:</strong>
+        <ul class="mb-0 mt-2">
             {% for item, mensaje in avisos %}
                 <li>Habitación {{ item.habitacion.numero }}: {{ mensaje }}</li>
             {% endfor %}
         </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
 {% endif %}
 
 {% if items %}
-<div class="card">
+<!-- Tabla del carrito -->
+<div class="card border-0 shadow-sm mb-4">
     <div class="table-responsive">
         <table class="table mb-0 align-middle">
-            <thead>
+            <thead class="table-dark">
                 <tr>
+                    <th style="width: 80px;">Imagen</th>
                     <th>Habitación</th>
-                    <th>Fechas</th>
-                    <th>Noches</th>
-                    <th>Huéspedes</th>
+                    <th>Fecha entrada</th>
+                    <th>Fecha salida</th>
+                    <th class="text-center">Noches</th>
+                    <th class="text-center">Huéspedes</th>
+                    <th class="text-end">Precio/Noche</th>
                     <th class="text-end">Subtotal</th>
-                    <th></th>
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in items %}
                 <tr>
                     <td>
+                        {% if item.habitacion.imagen %}
+                        <img src="{{ item.habitacion.imagen.url }}" alt="Habitación {{ item.habitacion.numero }}"
+                             class="rounded" style="width: 60px; height: 45px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 45px;">
+                            <i class="bi bi-image text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
                         <strong>{{ item.habitacion.numero }}</strong><br>
                         <small class="text-muted">{{ item.habitacion.tipo.nombre }}</small>
                     </td>
-                    <td>{{ item.fecha_entrada|date:"d/m/Y" }} → {{ item.fecha_salida|date:"d/m/Y" }}</td>
-                    <td>{{ item.noches }}</td>
-                    <td>{{ item.huespedes }}</td>
-                    <td class="text-end">${{ item.subtotal }}</td>
-                    <td class="text-end">
+                    <td>{{ item.fecha_entrada|date:"d/m/Y" }}</td>
+                    <td>{{ item.fecha_salida|date:"d/m/Y" }}</td>
+                    <td class="text-center">{{ item.noches }}</td>
+                    <td class="text-center">{{ item.huespedes }}</td>
+                    <td class="text-end">${{ item.precio_por_noche }}</td>
+                    <td class="text-end fw-bold">${{ item.subtotal }}</td>
+                    <td class="text-center">
                         <form method="post" action="{% url 'reservas:carrito_quitar' item.habitacion.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar del carrito">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -52,34 +74,48 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot>
+            <tfoot class="table-light">
                 <tr>
-                    <th colspan="4" class="text-end">Total:</th>
-                    <th class="text-end">${{ total }}</th>
-                    <th></th>
+                    <td colspan="7" class="text-end fw-bold fs-5">Total:</td>
+                    <td class="text-end fw-bold fs-5 text-primary">${{ total }}</td>
+                    <td></td>
                 </tr>
             </tfoot>
         </table>
     </div>
 </div>
 
-<div class="mt-3 d-flex gap-2">
-    {% if not avisos %}
-    <a href="{% url 'reservas:checkout' %}" class="btn btn-primary">
-        <i class="bi bi-credit-card"></i> Ir al pago
-    </a>
-    {% endif %}
+<!-- Acciones del carrito -->
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <div class="d-flex gap-2">
+        {% if not avisos %}
+        <a href="{% url 'reservas:checkout' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-credit-card"></i> Proceder al pago
+        </a>
+        {% endif %}
+        <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-search"></i> Seguir reservando
+        </a>
+    </div>
     <form method="post" action="{% url 'reservas:carrito_vaciar' %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-outline-secondary">Vaciar carrito</button>
+        <button type="submit" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Vaciar carrito
+        </button>
     </form>
-    <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-outline-primary">
-        Seguir buscando
-    </a>
 </div>
+
 {% else %}
-<div class="alert alert-info">
-    Tu carrito está vacío. <a href="{% url 'habitaciones:buscar_disponibilidad' %}">Buscar habitaciones</a>.
+<!-- Carrito vacío -->
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+    </div>
+    <h4 class="text-muted mb-3">Tu carrito está vacío</h4>
+    <p class="text-muted mb-4">Explora nuestras habitaciones disponibles y comienza a planificar tu estadía.</p>
+    <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-search"></i> Ver habitaciones disponibles
+    </a>
 </div>
 {% endif %}
 {% endblock %}

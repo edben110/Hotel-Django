@@ -5,13 +5,26 @@
 {% block content %}
 <h1>Eliminar Habitación</h1>
 
+{% if reservas_count > 0 %}
+<div class="alert alert-warning d-flex align-items-start" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+    <div>
+        <strong>Advertencia:</strong> Esta habitación tiene
+        <strong>{{ reservas_count }}</strong> reserva{{ reservas_count|pluralize:"s" }} asociada{{ reservas_count|pluralize:"s" }}.
+        ¿Deseas eliminarla de todas formas?
+        <br>
+        <small class="text-muted">Las reservas históricas se conservarán, pero la habitación dejará de estar disponible.</small>
+    </div>
+</div>
+{% endif %}
+
 <div class="card border-danger">
     <div class="card-body">
         <p class="text-danger">
             <i class="bi bi-exclamation-triangle"></i>
             ¿Estás seguro de que deseas eliminar la <strong>{{ habitacion }}</strong>?
         </p>
-        <p>Esta acción no se puede deshacer.</p>
+        <p>La habitación dejará de estar visible en el sistema. Las reservas históricas se conservarán.</p>
 
         <form method="post">
             {% csrf_token %}

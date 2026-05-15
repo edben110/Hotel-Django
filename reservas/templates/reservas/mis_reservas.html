@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Reservas{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="fw-bold"><i class="bi bi-calendar-check"></i> Mis Reservas</h2>
+        <p class="text-muted">Aquí puedes ver todas tus reservas realizadas.</p>
+    </div>
+</div>
+
+{% if reservas %}
+<div class="row">
+    {% for reserva in reservas %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>{{ reserva.codigo }}</strong>
+                <span class="badge bg-{% if reserva.estado == 'confirmada' %}success{% elif reserva.estado == 'pendiente' %}warning{% elif reserva.estado == 'cancelada' %}danger{% elif reserva.estado == 'completada' %}info{% else %}secondary{% endif %}">
+                    {{ reserva.get_estado_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Habitación {{ reserva.habitacion.numero }}</h5>
+                <p class="card-text">
+                    <i class="bi bi-door-open"></i> {{ reserva.habitacion.tipo.nombre }}<br>
+                    <i class="bi bi-calendar-event"></i> {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}<br>
+                    <i class="bi bi-moon"></i> {{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }}<br>
+                    <i class="bi bi-people"></i> {{ reserva.huespedes }} huésped{{ reserva.huespedes|pluralize:"es" }}<br>
+                    <i class="bi bi-cash"></i> <strong>${{ reserva.total }}</strong>
+                </p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'reservas:reserva_detail' reserva.codigo %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver detalles
+                    </a>
+                    {% if reserva.estado != 'cancelada' and reserva.estado != 'completada' %}
+                    <a href="{% url 'reservas:cancelar_reserva' reserva.codigo %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-x-circle"></i> Cancelar reserva
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-calendar-x text-muted" style="font-size: 5rem;"></i>
+    </div>
+    <h4 class="text-muted mb-3">No tienes reservas aún</h4>
+    <p class="text-muted mb-4">Explora nuestras habitaciones disponibles y realiza tu primera reserva.</p>
+    <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-search"></i> Buscar habitaciones
+    </a>
+</div>
+{% endif %}
+{% endblock %}

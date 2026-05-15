@@ -8,6 +8,9 @@ urlpatterns = [
     # Listado propio
     path('habitaciones/', views.habitaciones_disponibles, name='habitaciones_disponibles'),
 
+    # Mis reservas
+    path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
+
     # Carrito
     path('carrito/', views.carrito_detail, name='carrito_detail'),
     path('carrito/agregar/<int:habitacion_pk>/', views.agregar_al_carrito, name='agregar_al_carrito'),

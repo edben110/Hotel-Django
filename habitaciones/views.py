@@ -1,3 +1,6 @@
+from functools import wraps
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
@@ -10,13 +13,27 @@ from .forms import (
 )
 
 
+def admin_required(view_func):
+    """Decorador que verifica que el usuario tenga role == 'admin'."""
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, 'No tiene permisos para realizar esta acción. Solo administradores.')
+            return redirect('habitaciones:habitacion_list')
+        return view_func(request, *args, **kwargs)
+    return _wrapped
+
+
 # ===================== TIPO DE HABITACIÓN =====================
 
+@login_required
 def tipo_list(request):
     tipos = TipoHabitacion.objects.all()
     return render(request, 'habitaciones/tipo_list.html', {'tipos': tipos})
 
 
+@login_required
+@admin_required
 def tipo_create(request):
     if request.method == 'POST':
         form = TipoHabitacionForm(request.POST)
@@ -29,6 +46,8 @@ def tipo_create(request):
     return render(request, 'habitaciones/tipo_form.html', {'form': form, 'titulo': 'Crear Tipo de Habitación'})
 
 
+@login_required
+@admin_required
 def tipo_update(request, pk):
     tipo = get_object_or_404(TipoHabitacion, pk=pk)
     if request.method == 'POST':
@@ -42,6 +61,8 @@ def tipo_update(request, pk):
     return render(request, 'habitaciones/tipo_form.html', {'form': form, 'titulo': 'Editar Tipo de Habitación'})
 
 
+@login_required
+@admin_required
 def tipo_delete(request, pk):
     tipo = get_object_or_404(TipoHabitacion, pk=pk)
     if request.method == 'POST':
@@ -57,15 +78,17 @@ def tipo_delete(request, pk):
 # ===================== HABITACIÓN =====================
 
 def habitacion_list(request):
-    habitaciones = Habitacion.objects.select_related('tipo').all()
+    habitaciones = Habitacion.objects.select_related('tipo').filter(activa=True)
     return render(request, 'habitaciones/habitacion_list.html', {'habitaciones': habitaciones})
 
 
 def habitacion_detail(request, pk):
-    habitacion = get_object_or_404(Habitacion.objects.select_related('tipo'), pk=pk)
+    habitacion = get_object_or_404(Habitacion.objects.select_related('tipo'), pk=pk, activa=True)
     return render(request, 'habitaciones/habitacion_detail.html', {'habitacion': habitacion})
 
 
+@login_required
+@admin_required
 def habitacion_create(request):
     if request.method == 'POST':
         form = HabitacionForm(request.POST, request.FILES)
@@ -78,6 +101,8 @@ def habitacion_create(request):
     return render(request, 'habitaciones/habitacion_form.html', {'form': form, 'titulo': 'Crear Habitación'})
 
 
+@login_required
+@admin_required
 def habitacion_update(request, pk):
     habitacion = get_object_or_404(Habitacion, pk=pk)
     if request.method == 'POST':
@@ -91,22 +116,32 @@ def habitacion_update(request, pk):
     return render(request, 'habitaciones/habitacion_form.html', {'form': form, 'titulo': 'Editar Habitación'})
 
 
+@login_required
+@admin_required
 def habitacion_delete(request, pk):
-    habitacion = get_object_or_404(Habitacion, pk=pk)
+    habitacion = get_object_or_404(Habitacion, pk=pk, activa=True)
+    reservas_count = habitacion.reservas.count()
     if request.method == 'POST':
-        habitacion.delete()
-        messages.success(request, 'Habitación eliminada exitosamente.')
+        habitacion.activa = False
+        habitacion.save(update_fields=['activa'])
+        messages.success(request, 'Habitación eliminada correctamente.')
         return redirect('habitaciones:habitacion_list')
-    return render(request, 'habitaciones/habitacion_confirm_delete.html', {'habitacion': habitacion})
+    return render(request, 'habitaciones/habitacion_confirm_delete.html', {
+        'habitacion': habitacion,
+        'reservas_count': reservas_count,
+    })
 
 
 # ===================== PRECIO POR TEMPORADA =====================
 
+@login_required
 def precio_list(request):
     precios = PrecioTemporada.objects.select_related('tipo_habitacion').all()
     return render(request, 'habitaciones/precio_list.html', {'precios': precios})
 
 
+@login_required
+@admin_required
 def precio_create(request):
     if request.method == 'POST':
         form = PrecioTemporadaForm(request.POST)
@@ -119,6 +154,8 @@ def precio_create(request):
     return render(request, 'habitaciones/precio_form.html', {'form': form, 'titulo': 'Crear Precio por Temporada'})
 
 
+@login_required
+@admin_required
 def precio_update(request, pk):
     precio = get_object_or_404(PrecioTemporada, pk=pk)
     if request.method == 'POST':
@@ -132,6 +169,8 @@ def precio_update(request, pk):
     return render(request, 'habitaciones/precio_form.html', {'form': form, 'titulo': 'Editar Precio por Temporada'})
 
 
+@login_required
+@admin_required
 def precio_delete(request, pk):
     precio = get_object_or_404(PrecioTemporada, pk=pk)
     if request.method == 'POST':
@@ -153,8 +192,8 @@ def buscar_disponibilidad(request):
         tipo = form.cleaned_data.get('tipo')
         capacidad_minima = form.cleaned_data.get('capacidad_minima')
 
-        # Filtrar habitaciones disponibles
-        habitaciones = Habitacion.objects.filter(estado='disponible')
+        # Filtrar habitaciones disponibles (solo activas)
+        habitaciones = Habitacion.objects.filter(estado='disponible', activa=True)
 
         if tipo:
             habitaciones = habitaciones.filter(tipo=tipo)

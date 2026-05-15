@@ -30,6 +30,7 @@ class Habitacion(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible')
     descripcion = models.TextField(blank=True)
     imagen = models.ImageField(upload_to='habitaciones/', blank=True, null=True)
+    activa = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 

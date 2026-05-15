@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
@@ -55,6 +56,10 @@ class Reserva(models.Model):
     ]
 
     codigo = models.CharField(max_length=12, unique=True, blank=True)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='reservas',
+    )
     habitacion = models.ForeignKey(
         Habitacion, on_delete=models.PROTECT, related_name='reservas'
     )

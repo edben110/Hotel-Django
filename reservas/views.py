@@ -3,6 +3,7 @@ from decimal import Decimal
 import secrets
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -31,7 +32,7 @@ from .models import Pago, PoliticaCancelacion, Reserva
 
 def habitaciones_disponibles(request):
     """Listado de habitaciones (con botón reservar) propio de la app reservas."""
-    habitaciones = Habitacion.objects.filter(estado='disponible').select_related('tipo')
+    habitaciones = Habitacion.objects.filter(estado='disponible', activa=True).select_related('tipo')
     return render(request, 'reservas/habitaciones_disponibles.html', {
         'habitaciones': habitaciones,
     })
@@ -39,8 +40,15 @@ def habitaciones_disponibles(request):
 
 # ============================ CARRITO ============================
 
+@login_required
 def agregar_al_carrito(request, habitacion_pk):
-    habitacion = get_object_or_404(Habitacion, pk=habitacion_pk)
+    habitacion = get_object_or_404(Habitacion, pk=habitacion_pk, activa=True)
+
+    # Verificar si la habitación ya está en el carrito
+    carrito = Carrito(request)
+    if carrito.contiene(habitacion_pk):
+        messages.warning(request, 'La habitación ya está en el carrito.')
+        return redirect('reservas:carrito_detail')
 
     initial = {
         'fecha_entrada': request.GET.get('fecha_entrada') or '',
@@ -78,6 +86,7 @@ def agregar_al_carrito(request, habitacion_pk):
     })
 
 
+@login_required
 def carrito_detail(request):
     carrito = Carrito(request)
     items = list(carrito)
@@ -95,6 +104,7 @@ def carrito_detail(request):
     })
 
 
+@login_required
 @require_POST
 def carrito_quitar(request, habitacion_pk):
     Carrito(request).quitar(habitacion_pk)
@@ -102,6 +112,7 @@ def carrito_quitar(request, habitacion_pk):
     return redirect('reservas:carrito_detail')
 
 
+@login_required
 @require_POST
 def carrito_vaciar(request):
     Carrito(request).vaciar()
@@ -111,6 +122,7 @@ def carrito_vaciar(request):
 
 # ============================ CHECKOUT ============================
 
+@login_required
 def checkout(request):
     """Recoge datos del cliente, crea las reservas pendientes y abre la pasarela."""
     carrito = Carrito(request)
@@ -130,7 +142,7 @@ def checkout(request):
     if request.method == 'POST':
         cliente_form = DatosClienteForm(request.POST)
         if cliente_form.is_valid():
-            reservas = _crear_reservas_pendientes(items, cliente_form.cleaned_data)
+            reservas = _crear_reservas_pendientes(request.user, items, cliente_form.cleaned_data)
             carrito.vaciar()
 
             sesion = gateway.crear_sesion(
@@ -155,10 +167,12 @@ def checkout(request):
 
 
 @transaction.atomic
-def _crear_reservas_pendientes(items, datos_cliente):
+def _crear_reservas_pendientes(usuario, items, datos_cliente):
+    """Crea las reservas en estado pendiente."""
     creadas = []
     for item in items:
         reserva = Reserva.objects.create(
+            usuario=usuario,
             habitacion=item.habitacion,
             nombre_cliente=datos_cliente['nombre'],
             email_cliente=datos_cliente['email'],
@@ -227,7 +241,7 @@ def gateway_checkout(request, token):
 def pago_callback(request):
     """Endpoint que la pasarela invoca tras procesar.
 
-    Lee el resultado de la sesión, registra el `Pago` y confirma o
+    Lee el resultado de la sesión, registra el Pago y confirma o
     cancela las reservas asociadas.
     """
     token = request.GET.get('token') or request.session.get('hotelpay_token')
@@ -241,7 +255,6 @@ def pago_callback(request):
 
     resultado = request.session.pop('hotelpay_resultado_' + token, None)
     if not resultado:
-        # alguien aterrizó sin haber procesado: mandar de vuelta a la pasarela
         return redirect('reservas:gateway_checkout', token=token)
 
     codigos = sesion.metadata.get('reservas', [])
@@ -255,7 +268,7 @@ def pago_callback(request):
                     metodo='tarjeta',
                     estado='aprobado' if resultado['aprobado'] else 'rechazado',
                     referencia=f"{resultado['referencia']}-{reserva.codigo}",
-                    titular='',  # no almacenamos PII detallada
+                    titular='',
                     ultimos_4=resultado['ultimos_4'],
                     monto=reserva.total,
                 ),
@@ -264,6 +277,12 @@ def pago_callback(request):
             if not resultado['aprobado']:
                 reserva.motivo_cancelacion = f"Pago rechazado: {resultado['mensaje']}"
             reserva.save(update_fields=['estado', 'motivo_cancelacion'])
+
+            # Si fue aprobado, marcar habitación como ocupada
+            if resultado['aprobado']:
+                habitacion = reserva.habitacion
+                habitacion.estado = 'ocupada'
+                habitacion.save(update_fields=['estado'])
 
     request.session['ultimas_reservas'] = codigos
     request.session['ultimo_pago'] = resultado
@@ -325,11 +344,18 @@ def reserva_detail(request, codigo):
     })
 
 
+@login_required
 def cancelar_reserva(request, codigo):
     reserva = get_object_or_404(Reserva, codigo=codigo)
+
+    # Verificar que la reserva pertenece al usuario autenticado
+    if reserva.usuario != request.user:
+        messages.error(request, "No tienes permiso para cancelar esta reserva.")
+        return redirect('reservas:mis_reservas')
+
     if not reserva.puede_cancelarse:
         messages.warning(request, "Esta reserva ya no puede cancelarse.")
-        return redirect('reservas:reserva_detail', codigo=reserva.codigo)
+        return redirect('reservas:mis_reservas')
 
     reembolso = reserva.calcular_reembolso()
     if request.method == 'POST':
@@ -343,11 +369,17 @@ def cancelar_reserva(request, codigo):
             reserva.save(update_fields=[
                 'estado', 'fecha_cancelacion', 'motivo_cancelacion', 'monto_reembolsado',
             ])
+
+            # Restaurar habitación a disponible
+            habitacion = reserva.habitacion
+            habitacion.estado = 'disponible'
+            habitacion.save(update_fields=['estado'])
+
             messages.success(
                 request,
                 f"Reserva {reserva.codigo} cancelada. Reembolso: ${reembolso}."
             )
-            return redirect('reservas:reserva_detail', codigo=reserva.codigo)
+            return redirect('reservas:mis_reservas')
     else:
         form = CancelarReservaForm()
 
@@ -357,3 +389,14 @@ def cancelar_reserva(request, codigo):
         'reembolso_estimado': reembolso,
         'politicas': PoliticaCancelacion.objects.filter(activa=True),
     })
+
+
+# ============================ MIS RESERVAS ============================
+
+@login_required
+def mis_reservas(request):
+    """Muestra las reservas del usuario autenticado."""
+    reservas = Reserva.objects.filter(usuario=request.user).select_related(
+        'habitacion__tipo', 'pago'
+    )
+    return render(request, 'reservas/mis_reservas.html', {'reservas': reservas})
