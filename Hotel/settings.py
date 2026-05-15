@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 
+from django.core.exceptions import ImproperlyConfigured
+
 try:
     from decouple import config
 except ImportError:
@@ -153,6 +155,8 @@ if database_url and dj_database_url is not None:
     }
 elif database_url and dj_database_url is None:
     raise ImportError('dj_database_url is required when DATABASE_URL is set.')
+elif not DEBUG and os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+    raise ImproperlyConfigured('DATABASE_URL is required in production.')
 else:
     DATABASES = {
         'default': {
