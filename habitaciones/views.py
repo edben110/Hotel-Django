@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.models import Q
 
 from .models import TipoHabitacion, Habitacion, PrecioTemporada
 from .forms import (
@@ -163,13 +162,12 @@ def buscar_disponibilidad(request):
         if capacidad_minima:
             habitaciones = habitaciones.filter(capacidad__gte=capacidad_minima)
 
-        # Excluir habitaciones que tengan reservas en el rango de fechas
-        # (esto se integrará cuando exista el modelo de Reserva)
-        # habitaciones = habitaciones.exclude(
-        #     reservas__fecha_entrada__lt=fecha_salida,
-        #     reservas__fecha_salida__gt=fecha_entrada,
-        #     reservas__estado='confirmada'
-        # )
+        # Excluir habitaciones con reservas activas en el rango de fechas
+        habitaciones = habitaciones.exclude(
+            reservas__fecha_entrada__lt=fecha_salida,
+            reservas__fecha_salida__gt=fecha_entrada,
+            reservas__estado__in=['pendiente', 'confirmada']
+        )
 
     return render(request, 'habitaciones/buscar_disponibilidad.html', {
         'form': form,
