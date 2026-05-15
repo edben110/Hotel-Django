@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
 
@@ -25,12 +26,12 @@ def send_verification_email(request, user, token):
             f"Gracias."
         )
 
-        send_mail(
-            subject,
-            message,
-            None,
-            [user.email],
-        )
+        if not settings.EMAIL_HOST and 'console' not in settings.EMAIL_BACKEND.lower():
+            logger.warning("Correo de verificación no enviado porque EMAIL_HOST no está configurado.")
+            logger.info("Token de verificación para %s: %s", user.email, verification_url)
+            return
+
+        send_mail(subject, message, None, [user.email], fail_silently=False)
     except Exception as e:
         logger.exception("Error al enviar correo de verificación: %s", e)
         raise
