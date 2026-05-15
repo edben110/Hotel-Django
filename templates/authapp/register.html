@@ -4,90 +4,189 @@
 
 {% block content %}
 <style>
-    .register-section {
-        background: #faf8f5;
-        padding: 4rem 1.5rem;
-        min-height: 70vh;
+    /* Ocultar navbar y footer del base para full-screen split */
+    .hotel-navbar-luxury,
+    .hotel-footer-luxury {
+        display: none !important;
+    }
+
+    /* ===== SPLIT SCREEN LAYOUT ===== */
+    .split-container {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Lado izquierdo: imagen */
+    .split-left {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .split-left img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .split-left-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, rgba(0,0,0,.15), rgba(0,0,0,.45));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 3rem;
+    }
+
+    .split-left-overlay h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: .5rem;
+        text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    .split-left-overlay p {
+        color: rgba(255,255,255,.85);
+        font-size: .9rem;
+        max-width: 350px;
+        line-height: 1.6;
+    }
+
+    .split-left-features {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1.5rem;
+    }
+
+    .split-left-features .feature {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: .6rem;
+        color: rgba(255,255,255,.9);
+        font-size: .85rem;
+        font-weight: 500;
     }
 
-    .register-card {
-        max-width: 480px;
-        width: 100%;
-        margin: 0 auto;
+    .split-left-features .feature i {
+        color: #b8860b;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Lado derecho: registro */
+    .split-right {
+        width: 520px;
+        min-width: 450px;
         background: #fff;
-        border-radius: .75rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,.06);
-        padding: 2.5rem;
-        border: 1px solid #f0ebe3;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2.5rem 3rem;
+        position: relative;
+        overflow-y: auto;
     }
 
-    .register-card h3 {
+    .split-right-inner {
+        width: 100%;
+        max-width: 380px;
+    }
+
+    .split-brand {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #2c2c2c;
+        text-align: center;
+        margin-bottom: .25rem;
+        letter-spacing: .03em;
+    }
+
+    .split-brand-line {
+        width: 40px;
+        height: 2px;
+        background: #b8860b;
+        margin: 0 auto 1.75rem;
+        border-radius: 2px;
+    }
+
+    .split-right h2 {
         font-family: 'Playfair Display', serif;
         font-weight: 600;
         font-size: 1.5rem;
         color: #2c2c2c;
         text-align: center;
-        margin-bottom: .5rem;
+        margin-bottom: .4rem;
     }
 
-    .register-card .subtitle {
+    .split-right .register-subtitle {
         text-align: center;
         color: #7a7a7a;
-        font-size: .85rem;
+        font-size: .83rem;
         margin-bottom: 1.75rem;
     }
 
-    .register-card .form-control,
-    .register-card .form-select {
-        border: 1px solid #e8e0d5;
-        border-radius: .375rem;
-        padding: .75rem 1rem;
-        font-size: .9rem;
-        background: #faf8f5;
+    .split-right .form-label {
+        font-weight: 500;
+        font-size: .78rem;
+        color: #6b6b6b;
+        letter-spacing: .02em;
     }
 
-    .register-card .form-control:focus,
-    .register-card .form-select:focus {
+    .split-right .form-control,
+    .split-right .form-select {
+        border: 1px solid #e8e0d5;
+        border-radius: .375rem;
+        padding: .7rem 1rem;
+        font-size: .88rem;
+        background: #faf8f5;
+        transition: all .2s ease;
+    }
+
+    .split-right .form-control:focus,
+    .split-right .form-select:focus {
         border-color: #b8860b;
         box-shadow: 0 0 0 3px rgba(184, 134, 11, .1);
         background: #fff;
     }
 
-    .register-card .form-label {
-        font-weight: 500;
-        font-size: .8rem;
-        color: #6b6b6b;
-        letter-spacing: .02em;
-    }
-
-    .register-card .btn-register {
+    .btn-register {
         background: #b8860b;
         color: #fff;
         border: none;
         border-radius: .375rem;
-        padding: .75rem;
+        padding: .8rem;
         font-size: .9rem;
         font-weight: 600;
         letter-spacing: .03em;
         width: 100%;
+        cursor: pointer;
         transition: all .2s ease;
     }
 
-    .register-card .btn-register:hover {
+    .btn-register:hover {
         background: #9a7209;
         transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(184, 134, 11, .25);
     }
 
-    .register-card .divider {
+    .split-divider {
         position: relative;
         text-align: center;
-        margin: 1.5rem 0;
+        margin: 1.25rem 0;
     }
 
-    .register-card .divider::before {
+    .split-divider::before {
         content: '';
         position: absolute;
         top: 50%;
@@ -97,48 +196,123 @@
         background: #e8e0d5;
     }
 
-    .register-card .divider span {
+    .split-divider span {
         background: #fff;
         padding: 0 .75rem;
         position: relative;
-        color: #999;
-        font-size: .8rem;
+        color: #bbb;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .split-footer {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: .75rem;
+        color: #bbb;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .split-container {
+            flex-direction: column;
+        }
+
+        .split-left {
+            height: 35vh;
+            min-height: 220px;
+        }
+
+        .split-right {
+            width: 100%;
+            min-width: unset;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .split-left-overlay {
+            padding: 2rem;
+        }
+
+        .split-left-overlay h1 {
+            font-size: 1.8rem;
+        }
+
+        .split-left-features {
+            display: none;
+        }
     }
 </style>
 
-<section class="register-section">
-    <div class="register-card">
-        <h3>Crear Cuenta</h3>
-        <p class="subtitle">Regístrate para reservar habitaciones exclusivas</p>
-
-        <form method="POST" novalidate>
-            {% csrf_token %}
-
-            {% for field in form %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">
-                        {{ field.label }}
-                    </label>
-                    {{ field }}
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
-                    {% endif %}
+<div class="split-container">
+    <!-- Lado izquierdo: imagen + info -->
+    <div class="split-left">
+        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80" alt="Hotel de Lujo - Habitación">
+        <div class="split-left-overlay">
+            <h1>Únete a nosotros</h1>
+            <p>Crea tu cuenta y accede a habitaciones exclusivas con las mejores tarifas.</p>
+            <div class="split-left-features">
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Reservas en segundos
                 </div>
-            {% endfor %}
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Mejores precios garantizados
+                </div>
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Cancelación flexible
+                </div>
+                <div class="feature">
+                    <i class="bi bi-check-circle-fill"></i> Atención personalizada 24/7
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <button type="submit" class="btn-register mt-2">Registrarse</button>
-        </form>
+    <!-- Lado derecho: formulario de registro -->
+    <div class="split-right">
+        <div class="split-right-inner">
+            <div class="split-brand">HOTEL</div>
+            <div class="split-brand-line"></div>
 
-        <div class="divider">
-            <span>o</span>
+            <h2>Crear Cuenta</h2>
+            <p class="register-subtitle">Completa tus datos para comenzar</p>
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-register mt-2">Crear mi cuenta</button>
+            </form>
+
+            <div class="split-divider">
+                <span>o</span>
+            </div>
+
+            <p class="text-center mb-0" style="font-size:.85rem; color:#7a7a7a;">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'login' %}" style="color:#b8860b; font-weight:600; text-decoration:none;">Inicia sesión aquí</a>
+            </p>
         </div>
 
-        <p class="text-center mb-0" style="font-size:.85rem; color:#7a7a7a;">
-            ¿Ya tienes cuenta?
-            <a href="{% url 'login' %}" style="color:#b8860b; font-weight:600; text-decoration:none;">Inicia sesión aquí</a>
-        </p>
+        <div class="split-footer">
+            &copy; 2025 Hotel de Lujo. Todos los derechos reservados.
+        </div>
     </div>
-</section>
+</div>
 {% endblock %}
