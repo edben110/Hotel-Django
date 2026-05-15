@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:
     from decouple import config
@@ -36,6 +37,20 @@ def _csv_env(name, default=''):
         return []
     return [item.strip() for item in str(value).split(',') if item.strip()]
 
+
+def _host_from_url(value):
+    if not value:
+        return ''
+    parsed = urlparse(str(value))
+    if parsed.scheme and parsed.netloc:
+        return parsed.netloc
+    return str(value).strip()
+
+
+def _append_unique(values, item):
+    if item and item not in values:
+        values.append(item)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -50,6 +65,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-qn#on732ztf&r6o&$o16^
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = _csv_env('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+_append_unique(ALLOWED_HOSTS, _host_from_url(config('BACKEND_URL', default='')))
+_append_unique(ALLOWED_HOSTS, _host_from_url(config('API_URL', default='')))
+_append_unique(ALLOWED_HOSTS, config('RENDER_EXTERNAL_HOSTNAME', default=''))
+if not DEBUG:
+    _append_unique(ALLOWED_HOSTS, '.onrender.com')
+
 CSRF_TRUSTED_ORIGINS = _csv_env(
     'CSRF_TRUSTED_ORIGINS',
     default='http://localhost:8000,http://127.0.0.1:8000',
@@ -57,6 +78,16 @@ CSRF_TRUSTED_ORIGINS = _csv_env(
 FRONTEND_URL = config('FRONTEND_URL', default='')
 API_URL = config('API_URL', default='')
 BACKEND_URL = config('BACKEND_URL', default='')
+for trusted_origin in (
+    FRONTEND_URL,
+    BACKEND_URL,
+    API_URL,
+):
+    if trusted_origin:
+        _append_unique(CSRF_TRUSTED_ORIGINS, trusted_origin)
+render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default='')
+if render_hostname:
+    _append_unique(CSRF_TRUSTED_ORIGINS, f'https://{render_hostname}')
 CORS_ALLOWED_ORIGINS = _csv_env('CORS_ALLOWED_ORIGINS')
 if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
