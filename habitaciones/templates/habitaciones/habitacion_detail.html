@@ -74,7 +74,7 @@
 
 <div class="page-wrapper">
     <div class="room-hero fade-in-up">
-        {% if habitacion.imagen %}
+        {% if habitacion.tiene_imagen_real %}
         <img src="{{ habitacion.imagen.url }}" alt="Habitación {{ habitacion.numero }}">
         {% else %}
         <div class="room-hero-placeholder"><i class="bi bi-building"></i></div>

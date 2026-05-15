@@ -260,6 +260,8 @@ def pago_callback(request):
 
     with transaction.atomic():
         for reserva in reservas:
+            if reserva.estado != 'pendiente':
+                continue
             Pago.objects.update_or_create(
                 reserva=reserva,
                 defaults=dict(

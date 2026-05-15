@@ -41,3 +41,12 @@ class Habitacion(models.Model):
 
     def __str__(self):
         return f"Habitación {self.numero} - {self.tipo.nombre}"
+
+    @property
+    def tiene_imagen_real(self):
+        if not self.imagen:
+            return False
+        try:
+            return self.imagen.storage.exists(self.imagen.name)
+        except Exception:
+            return False
