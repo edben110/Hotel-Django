@@ -241,7 +241,7 @@
         {% for habitacion in habitaciones %}
         <div class="col-sm-6 col-lg-4 col-xl-3">
             <div class="card room-card h-100">
-                {% if habitacion.imagen %}
+                {% if habitacion.tiene_imagen_real %}
                 <img src="{{ habitacion.imagen.url }}" class="room-img" alt="Habitación {{ habitacion.numero }}">
                 {% else %}
                 <div class="room-img-placeholder">

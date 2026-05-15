@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
 from habitaciones.models import Habitacion, TipoHabitacion
@@ -152,6 +153,15 @@ class PasarelaSimuladaTests(TestCase):
 class FlujoCompletoCheckoutTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        User = get_user_model()
+        cls.user = User.objects.create_user(
+            username='cliente-test',
+            email='cliente@test.com',
+            password='Testpass123',
+            role='cliente',
+            is_active=True,
+            is_verified=True,
+        )
         cls.tipo = TipoHabitacion.objects.create(nombre='Suite Test')
         cls.hab = Habitacion.objects.create(
             numero='T-1', tipo=cls.tipo, capacidad=2,
@@ -164,6 +174,7 @@ class FlujoCompletoCheckoutTests(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.client.force_login(self.user)
         fe = (date.today() + timedelta(days=10)).isoformat()
         fs = (date.today() + timedelta(days=12)).isoformat()
         self.client.post(
@@ -230,3 +241,16 @@ class FlujoCompletoCheckoutTests(TestCase):
         reserva.refresh_from_db()
         self.assertEqual(reserva.estado, 'cancelada')
         self.assertEqual(reserva.monto_reembolsado, Decimal('200.00'))
+
+    def test_callback_ignora_reservas_ya_procesadas(self):
+        token = self._checkout_y_obtener_token()
+        reserva = Reserva.objects.get(habitacion=self.hab)
+        reserva.estado = 'cancelada'
+        reserva.save(update_fields=['estado'])
+
+        r = self.client.post(f'/reservas/hotelpay/{token}/', _tarjeta_aprobada(), follow=True)
+        self.assertEqual(r.status_code, 200)
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.estado, 'cancelada')
+        self.assertFalse(Pago.objects.filter(reserva=reserva).exists())

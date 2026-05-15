@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -67,6 +68,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-qn#on732ztf&r6o&$o16^
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = _csv_env('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+_append_unique(ALLOWED_HOSTS, 'testserver')
 _append_unique(ALLOWED_HOSTS, _host_from_url(config('BACKEND_URL', default='')))
 _append_unique(ALLOWED_HOSTS, _host_from_url(config('API_URL', default='')))
 _append_unique(ALLOWED_HOSTS, config('RENDER_EXTERNAL_HOSTNAME', default=''))
@@ -94,6 +96,8 @@ CORS_ALLOWED_ORIGINS = _csv_env('CORS_ALLOWED_ORIGINS')
 if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 CORS_ALLOW_CREDENTIALS = True
+
+RUNNING_TESTS = 'test' in sys.argv
 
 
 # Application definition
@@ -290,7 +294,7 @@ LOGOUT_REDIRECT_URL = '/auth/login/'
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
-    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not RUNNING_TESTS, cast=bool)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
