@@ -17,8 +17,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: rgba(245, 240, 235, .88);
-        backdrop-filter: blur(2px);
+        background: rgba(245, 240, 235, .65);
     }
     .admin-wrapper > * {
         position: relative;
@@ -78,12 +77,12 @@
         gap: 2rem;
         margin-bottom: 2rem;
         flex-wrap: wrap;
-        padding: 1.5rem 2rem;
-        background: rgba(255, 255, 255, .92);
-        backdrop-filter: blur(10px);
-        border-radius: 1.25rem;
-        border: 1px solid rgba(255, 255, 255, .6);
-        box-shadow: 0 4px 20px rgba(0,0,0,.04);
+        padding: 1.75rem 2rem;
+        background: rgba(255, 255, 255, .95);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, .8);
+        box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
     }
     .top-metric {
         display: flex;
@@ -129,17 +128,17 @@
 
     /* Bento card base */
     .bento-card {
-        background: rgba(255, 255, 255, .92);
-        backdrop-filter: blur(10px);
-        border-radius: 1.25rem;
-        border: 1px solid rgba(255, 255, 255, .6);
-        box-shadow: 0 4px 20px rgba(0,0,0,.04);
+        background: rgba(255, 255, 255, .95);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, .8);
+        box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
         padding: 1.75rem;
-        transition: box-shadow .2s ease, transform .2s ease;
+        transition: box-shadow .25s ease, transform .25s ease;
     }
     .bento-card:hover {
-        box-shadow: 0 8px 30px rgba(0,0,0,.06);
-        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.04);
+        transform: translateY(-3px);
     }
 
     /* Card sizes */
@@ -155,9 +154,13 @@
 
     /* Profile/Ocupación card (dark) */
     .bento-dark {
-        background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+        background: linear-gradient(145deg, #1a1a1a, #2c2c2c, #1f1a14);
         color: #fff;
-        border: 1px solid rgba(184,134,11,.2);
+        border: 1px solid rgba(184,134,11,.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.1);
+    }
+    .bento-dark:hover {
+        box-shadow: 0 16px 48px rgba(0,0,0,.2), 0 4px 8px rgba(0,0,0,.1);
     }
     .bento-dark .card-label { color: rgba(255,255,255,.5); }
     .bento-dark .card-value { color: #fff; }
@@ -176,21 +179,21 @@
         font-weight: 600;
         font-size: 1.05rem;
         color: #1a1a1a;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     .bento-card .card-title-custom .title-icon {
-        width: 28px;
-        height: 28px;
-        background: rgba(184,134,11,.08);
-        border-radius: .5rem;
+        width: 32px;
+        height: 32px;
+        background: rgba(184,134,11,.1);
+        border-radius: .6rem;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #b8860b;
-        font-size: .8rem;
+        font-size: .85rem;
     }
     .bento-card .big-number {
         font-family: 'Playfair Display', serif;
@@ -229,17 +232,27 @@
     /* Activity list */
     .activity-list { list-style: none; padding: 0; margin: 0; }
     .activity-list li {
-        padding: .7rem 0;
-        border-bottom: 1px solid #f5f0e8;
+        padding: .85rem 0;
+        border-bottom: 1px solid rgba(184,134,11,.06);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: padding-left .15s ease;
     }
+    .activity-list li:hover { padding-left: .5rem; }
     .activity-list li:last-child { border-bottom: none; }
-    .activity-list .act-name { font-size: .83rem; font-weight: 600; color: #2c2c2c; }
-    .activity-list .act-sub { font-size: .72rem; color: #999; }
-    .activity-list .act-date { font-size: .7rem; color: #bbb; white-space: nowrap; }
-    .activity-list .empty { text-align: center; color: #ccc; padding: 1.5rem 0; font-size: .85rem; }
+    .activity-list .act-name { font-size: .85rem; font-weight: 600; color: #1a1a1a; }
+    .activity-list .act-sub { font-size: .73rem; color: #999; margin-top: .1rem; }
+    .activity-list .act-date {
+        font-size: .7rem;
+        color: #b8860b;
+        white-space: nowrap;
+        background: rgba(184,134,11,.06);
+        padding: .2rem .5rem;
+        border-radius: .25rem;
+        font-weight: 500;
+    }
+    .activity-list .empty { text-align: center; color: #bbb; padding: 2rem 0; font-size: .85rem; }
 
     /* Quick actions */
     .quick-actions {
@@ -267,6 +280,27 @@
 
     /* Chart container */
     .chart-container { position: relative; }
+
+    /* Section divider */
+    .bento-section-label {
+        grid-column: span 12;
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-top: .5rem;
+    }
+    .bento-section-label i { color: #b8860b; }
+    .bento-section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(184,134,11,.15);
+    }
+    @media(max-width:991px) { .bento-section-label { grid-column: span 1; } }
 </style>
 
 <div class="admin-wrapper">
@@ -347,6 +381,7 @@
         </div>
 
         <!-- Últimas reservas -->
+        <div class="bento-section-label"><i class="bi bi-activity"></i> Actividad reciente</div>
         <div class="bento-card bento-span-5">
             <div class="card-title-custom">
                 Últimas reservas
@@ -374,6 +409,7 @@
         </div>
 
         <!-- Habitación más reservada -->
+        <div class="bento-section-label"><i class="bi bi-bar-chart"></i> Estadísticas</div>
         <div class="bento-card bento-span-4">
             <div class="card-title-custom">
                 Top habitaciones
@@ -450,8 +486,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: rgba(245, 240, 235, .88);
-        backdrop-filter: blur(2px);
+        background: rgba(245, 240, 235, .65);
     }
     .client-wrapper > * {
         position: relative;
