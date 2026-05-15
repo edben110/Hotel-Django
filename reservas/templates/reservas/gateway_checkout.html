@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ gateway_name }} — Pago seguro{% endblock %}
+
+{% block content %}
+<style>
+    .hotelpay-card { max-width: 560px; margin: 0 auto; }
+    .hotelpay-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+        color: white; padding: 1.5rem; border-radius: .5rem .5rem 0 0;
+    }
+    .hotelpay-brand { font-weight: 700; font-size: 1.6rem; letter-spacing: -.5px; }
+    .hotelpay-brand small { font-weight: 400; opacity: .8; }
+    .test-cards code { cursor: pointer; }
+</style>
+
+<div class="hotelpay-card">
+    <div class="alert alert-warning small mb-3">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>Modo simulación.</strong> {{ gateway_name }} es una pasarela de prueba. No se procesan cobros reales.
+    </div>
+
+    <div class="hotelpay-header d-flex justify-content-between align-items-center">
+        <div>
+            <div class="hotelpay-brand">
+                <i class="bi bi-shield-lock-fill"></i> {{ gateway_name }}
+                <small>{{ gateway_version }}</small>
+            </div>
+            <small>Pago seguro · cifrado simulado</small>
+        </div>
+        <div class="text-end">
+            <small class="d-block">A pagar</small>
+            <strong style="font-size: 1.6rem;">${{ sesion.monto }}</strong>
+            <small class="d-block">{{ sesion.moneda }}</small>
+        </div>
+    </div>
+
+    <div class="card border-top-0" style="border-radius: 0 0 .5rem .5rem;">
+        <div class="card-body">
+            <p class="text-muted small mb-3">{{ sesion.descripcion }}</p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
+
+                <input type="hidden" name="metodo" value="tarjeta">
+
+                <div class="mb-3">
+                    <label class="form-label">Titular de la tarjeta</label>
+                    {{ form.titular }}
+                    {% for error in form.titular.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Número de tarjeta</label>
+                    <div class="input-group">
+                        {{ form.numero_tarjeta }}
+                        <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                    </div>
+                    {% for error in form.numero_tarjeta.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-7 mb-3">
+                        <label class="form-label">Expiración (MM/AA)</label>
+                        {{ form.expiracion }}
+                        {% for error in form.expiracion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-5 mb-3">
+                        <label class="form-label">CVV</label>
+                        {{ form.cvv }}
+                        {% for error in form.cvv.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                    <i class="bi bi-lock-fill"></i> Pagar ${{ sesion.monto }}
+                </button>
+            </form>
+
+            <hr>
+            <details class="test-cards">
+                <summary class="text-muted small">Tarjetas de prueba</summary>
+                <table class="table table-sm mt-2 mb-0">
+                    {% for numero, descripcion in tarjetas_prueba %}
+                    <tr>
+                        <td><code>{{ numero }}</code></td>
+                        <td class="text-muted small">{{ descripcion }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <small class="text-muted">Cualquier expiración futura y CVV de 3 dígitos.</small>
+            </details>
+        </div>
+        <div class="card-footer text-center text-muted small">
+            <i class="bi bi-shield-check"></i>
+            Sesión: <code>{{ sesion.token|truncatechars:20 }}</code>
+        </div>
+    </div>
+</div>
+{% endblock %}
