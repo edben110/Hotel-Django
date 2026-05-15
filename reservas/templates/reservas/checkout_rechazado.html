@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Pago rechazado{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+    <h1 class="mt-2">Pago rechazado</h1>
+    <p class="text-muted">{{ resultado.mensaje }}</p>
+</div>
+
+<div class="card border-danger mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Detalle de la operación</h5>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Pasarela</dt>
+            <dd class="col-sm-8">{{ gateway_name }}</dd>
+            <dt class="col-sm-4">Referencia</dt>
+            <dd class="col-sm-8"><code>{{ resultado.referencia }}</code></dd>
+            <dt class="col-sm-4">Tarjeta</dt>
+            <dd class="col-sm-8">{{ resultado.marca|capfirst }} **** {{ resultado.ultimos_4 }}</dd>
+            <dt class="col-sm-4">Mensaje</dt>
+            <dd class="col-sm-8">{{ resultado.mensaje }}</dd>
+        </dl>
+    </div>
+</div>
+
+<p class="text-muted">Las reservas fueron canceladas automáticamente. Puedes intentar nuevamente con otra tarjeta.</p>
+
+<a href="{% url 'reservas:habitaciones_disponibles' %}" class="btn btn-primary">
+    <i class="bi bi-arrow-clockwise"></i> Volver a buscar habitaciones
+</a>
+{% endblock %}
