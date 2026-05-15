@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Tu carrito{% endblock %}
+
+{% block content %}
+<h1><i class="bi bi-cart"></i> Tu carrito</h1>
+
+{% if avisos %}
+    <div class="alert alert-warning">
+        <strong>Hay problemas con tu reserva:</strong>
+        <ul class="mb-0">
+            {% for item, mensaje in avisos %}
+                <li>Habitación {{ item.habitacion.numero }}: {{ mensaje }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% if items %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Habitación</th>
+                    <th>Fechas</th>
+                    <th>Noches</th>
+                    <th>Huéspedes</th>
+                    <th class="text-end">Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.habitacion.numero }}</strong><br>
+                        <small class="text-muted">{{ item.habitacion.tipo.nombre }}</small>
+                    </td>
+                    <td>{{ item.fecha_entrada|date:"d/m/Y" }} → {{ item.fecha_salida|date:"d/m/Y" }}</td>
+                    <td>{{ item.noches }}</td>
+                    <td>{{ item.huespedes }}</td>
+                    <td class="text-end">${{ item.subtotal }}</td>
+                    <td class="text-end">
+                        <form method="post" action="{% url 'reservas:carrito_quitar' item.habitacion.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Total:</th>
+                    <th class="text-end">${{ total }}</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    {% if not avisos %}
+    <a href="{% url 'reservas:checkout' %}" class="btn btn-primary">
+        <i class="bi bi-credit-card"></i> Ir al pago
+    </a>
+    {% endif %}
+    <form method="post" action="{% url 'reservas:carrito_vaciar' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary">Vaciar carrito</button>
+    </form>
+    <a href="{% url 'habitaciones:buscar_disponibilidad' %}" class="btn btn-outline-primary">
+        Seguir buscando
+    </a>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Tu carrito está vacío. <a href="{% url 'habitaciones:buscar_disponibilidad' %}">Buscar habitaciones</a>.
+</div>
+{% endif %}
+{% endblock %}

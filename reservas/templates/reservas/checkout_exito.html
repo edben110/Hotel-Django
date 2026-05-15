@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Reserva confirmada{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+    <h1 class="mt-2">¡Pago aprobado!</h1>
+    <p class="text-muted">Guarda tu(s) código(s) para consultar o cancelar tu reserva.</p>
+</div>
+
+{% for reserva in reservas %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h4>Habitación {{ reserva.habitacion.numero }} ·
+                    <span class="text-muted">{{ reserva.habitacion.tipo.nombre }}</span>
+                </h4>
+                <p class="mb-1">
+                    <strong>Código:</strong>
+                    <code class="fs-5">{{ reserva.codigo }}</code>
+                </p>
+                <p class="mb-1"><strong>Cliente:</strong> {{ reserva.nombre_cliente }} ({{ reserva.email_cliente }})</p>
+                <p class="mb-1">
+                    <strong>Fechas:</strong>
+                    {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}
+                    ({{ reserva.noches }} noche{{ reserva.noches|pluralize:"s" }})
+                </p>
+                {% if reserva.pago %}
+                <p class="mb-0"><strong>Referencia de pago:</strong> {{ reserva.pago.referencia }}</p>
+                {% endif %}
+            </div>
+            <div class="text-end">
+                <span class="badge bg-success fs-6">{{ reserva.get_estado_display }}</span>
+                <h3 class="mt-2 mb-0">${{ reserva.total }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn btn-outline-primary">
+            Ver detalle
+        </a>
+    </div>
+</div>
+{% endfor %}
+
+<div class="text-center mt-4">
+    <a href="{% url 'habitaciones:habitacion_list' %}" class="btn btn-link">Volver al inicio</a>
+</div>
+{% endblock %}
