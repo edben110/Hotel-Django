@@ -21,7 +21,16 @@
             {% for field in form %}
                 <div class="mb-3">
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
+                    {% if field.name == "tipo" %}
+                        <div class="input-group">
+                            {{ field }}
+                            <a href="{% url 'habitaciones:tipo_create' %}" class="btn btn-outline-success" title="Crear nuevo tipo de habitación">
+                                <i class="bi bi-plus-lg"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
                     {% if field.errors %}
                         <div class="invalid-feedback d-block">
                             {% for error in field.errors %}
