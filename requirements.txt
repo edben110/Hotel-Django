@@ -5,6 +5,4 @@ dj-database-url
 python-decouple
 whitenoise
 Pillow
-pandas
-openpyxl
 reportlab

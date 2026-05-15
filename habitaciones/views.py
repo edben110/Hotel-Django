@@ -4,11 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import TipoHabitacion, Habitacion, PrecioTemporada
+from .models import TipoHabitacion, Habitacion
 from .forms import (
     TipoHabitacionForm,
     HabitacionForm,
-    PrecioTemporadaForm,
     BusquedaDisponibilidadForm,
 )
 
@@ -130,54 +129,6 @@ def habitacion_delete(request, pk):
         'habitacion': habitacion,
         'reservas_count': reservas_count,
     })
-
-
-# ===================== PRECIO POR TEMPORADA =====================
-
-@login_required
-def precio_list(request):
-    precios = PrecioTemporada.objects.select_related('tipo_habitacion').all()
-    return render(request, 'habitaciones/precio_list.html', {'precios': precios})
-
-
-@login_required
-@admin_required
-def precio_create(request):
-    if request.method == 'POST':
-        form = PrecioTemporadaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Precio por temporada creado exitosamente.')
-            return redirect('habitaciones:precio_list')
-    else:
-        form = PrecioTemporadaForm()
-    return render(request, 'habitaciones/precio_form.html', {'form': form, 'titulo': 'Crear Precio por Temporada'})
-
-
-@login_required
-@admin_required
-def precio_update(request, pk):
-    precio = get_object_or_404(PrecioTemporada, pk=pk)
-    if request.method == 'POST':
-        form = PrecioTemporadaForm(request.POST, instance=precio)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Precio por temporada actualizado exitosamente.')
-            return redirect('habitaciones:precio_list')
-    else:
-        form = PrecioTemporadaForm(instance=precio)
-    return render(request, 'habitaciones/precio_form.html', {'form': form, 'titulo': 'Editar Precio por Temporada'})
-
-
-@login_required
-@admin_required
-def precio_delete(request, pk):
-    precio = get_object_or_404(PrecioTemporada, pk=pk)
-    if request.method == 'POST':
-        precio.delete()
-        messages.success(request, 'Precio por temporada eliminado exitosamente.')
-        return redirect('habitaciones:precio_list')
-    return render(request, 'habitaciones/precio_confirm_delete.html', {'precio': precio})
 
 
 # ===================== BÚSQUEDA POR DISPONIBILIDAD =====================

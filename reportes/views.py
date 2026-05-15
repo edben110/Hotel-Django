@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from io import BytesIO
-
-import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -70,7 +67,6 @@ def reporte_reservas(request):
         'modo': 'reservas',
         'reservas': reservas,
         'export_pdf_url': reverse('reportes:exportar_reservas_pdf'),
-        'export_excel_url': reverse('reportes:exportar_reservas_excel'),
         'total_registros': reservas.count(),
     })
 
@@ -92,12 +88,10 @@ def reporte_clientes(request):
         'modo': 'clientes',
         'filas_clientes': filas,
         'export_pdf_url': reverse('reportes:exportar_clientes_pdf'),
-        'export_excel_url': reverse('reportes:exportar_clientes_excel'),
         'total_registros': len(filas),
     })
 
 
-@login_required
 def reporte_habitaciones(request):
     if not _es_admin(request):
         return redirect('home')
@@ -118,7 +112,6 @@ def reporte_habitaciones(request):
     for reserva in reservas:
         reservas_por_habitacion.setdefault(reserva.habitacion_id, 0)
         reservas_por_habitacion[reserva.habitacion_id] += 1
-
     for habitacion in habitaciones.order_by('numero'):
         filas.append({
             'habitacion': habitacion,
@@ -131,7 +124,6 @@ def reporte_habitaciones(request):
         'modo': 'habitaciones',
         'filas_habitaciones': filas,
         'export_pdf_url': reverse('reportes:exportar_habitaciones_pdf'),
-        'export_excel_url': reverse('reportes:exportar_habitaciones_excel'),
         'total_registros': len(filas),
     })
 
@@ -156,33 +148,7 @@ def exportar_reservas_pdf(request):
         ]
         for reserva in reservas
     ]
-    encabezados = ['Código', 'Cliente', 'Email', 'Habitación', 'Tipo', 'Creación', 'Ingreso', 'Salida', 'Estado', 'Total']
     return _generar_pdf('Reporte de Reservas', encabezados, filas, 'reporte_reservas.pdf')
-
-
-@login_required
-def exportar_reservas_excel(request):
-    if not _es_admin(request):
-        return redirect('home')
-    reservas = _filtrar_reservas_request(request)
-    dataframe = pd.DataFrame([
-        {
-            'codigo': reserva.codigo,
-            'cliente': reserva.nombre_cliente,
-            'email': reserva.email_cliente,
-            'habitacion': reserva.habitacion.numero,
-            'tipo_habitacion': reserva.habitacion.tipo.nombre,
-            'fecha_reserva': reserva.fecha_creacion,
-            'fecha_ingreso': reserva.fecha_entrada,
-            'fecha_salida': reserva.fecha_salida,
-            'estado': reserva.get_estado_display(),
-            'total': float(reserva.total),
-        }
-        for reserva in reservas
-    ])
-    return _generar_excel(dataframe, 'reporte_reservas.xlsx')
-
-
 @login_required
 def exportar_clientes_pdf(request):
     if not _es_admin(request):
@@ -201,24 +167,6 @@ def exportar_clientes_pdf(request):
         for fila in filas
     ]
     return _generar_pdf('Reporte de Clientes', encabezados, tabla, 'reporte_clientes.pdf')
-
-
-@login_required
-def exportar_clientes_excel(request):
-    if not _es_admin(request):
-        return redirect('home')
-    filas = construir_filas_clientes(_filtrar_reservas_request(request))
-    dataframe = pd.DataFrame([{
-        'cliente': fila['nombre_cliente'],
-        'email': fila['email_cliente'],
-        'total_reservas': fila['total_reservas'],
-        'total_gastado': float(fila['total_gastado']),
-        'primera_reserva': fila['primera_reserva'],
-        'ultima_reserva': fila['ultima_reserva'],
-    } for fila in filas])
-    return _generar_excel(dataframe, 'reporte_clientes.xlsx')
-
-
 @login_required
 def exportar_habitaciones_pdf(request):
     if not _es_admin(request):
@@ -237,24 +185,6 @@ def exportar_habitaciones_pdf(request):
         for fila in filas
     ]
     return _generar_pdf('Reporte de Habitaciones', encabezados, tabla, 'reporte_habitaciones.pdf')
-
-
-@login_required
-def exportar_habitaciones_excel(request):
-    if not _es_admin(request):
-        return redirect('home')
-    filas = _filas_habitaciones(_filtrar_reservas_request(request))
-    dataframe = pd.DataFrame([{
-        'habitacion': fila['habitacion'].numero,
-        'tipo': fila['habitacion'].tipo.nombre,
-        'estado': fila['habitacion'].get_estado_display(),
-        'capacidad': fila['habitacion'].capacidad,
-        'precio_por_noche': float(fila['habitacion'].precio_por_noche),
-        'total_reservas': fila['total_reservas'],
-    } for fila in filas])
-    return _generar_excel(dataframe, 'reporte_habitaciones.xlsx')
-
-
 def _filtrar_reservas_request(request):
     form = FiltrosReporteForm(request.GET or None)
     reservas = Reserva.objects.select_related('habitacion__tipo', 'pago')
@@ -300,18 +230,5 @@ def _generar_pdf(titulo, encabezados, filas, nombre_archivo):
     documento.build(elementos)
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
-    return response
-
-
-def _generar_excel(dataframe, nombre_archivo):
-    buffer = BytesIO()
-    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-        dataframe.to_excel(writer, index=False, sheet_name='Reporte')
-    buffer.seek(0)
-    response = HttpResponse(
-        buffer.getvalue(),
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    )
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
     return response

@@ -1,6 +1,4 @@
-from datetime import date
 from decimal import Decimal
-import secrets
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -308,11 +306,6 @@ def gateway_resultado(request, token):
         'resultado': resultado,
         'gateway_name': gateway.GATEWAY_NAME,
     })
-
-
-# Compatibilidad con el nombre antiguo de URL
-def checkout_exito(request):
-    return redirect('reservas:carrito_detail')
 
 
 # ============================ CONSULTA / CANCELACIÓN ============================

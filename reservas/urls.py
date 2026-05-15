@@ -19,7 +19,6 @@ urlpatterns = [
 
     # Checkout (recoge datos del cliente y abre la pasarela)
     path('checkout/', views.checkout, name='checkout'),
-    path('checkout/exito/', views.checkout_exito, name='checkout_exito'),
 
     # Pasarela simulada HotelPay (callback debe ir antes que <token>)
     path('hotelpay/callback/', views.pago_callback, name='pago_callback'),

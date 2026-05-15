@@ -17,12 +17,6 @@ urlpatterns = [
     path('<int:pk>/editar/', views.habitacion_update, name='habitacion_update'),
     path('<int:pk>/eliminar/', views.habitacion_delete, name='habitacion_delete'),
 
-    # Precios por temporada
-    path('precios/', views.precio_list, name='precio_list'),
-    path('precios/crear/', views.precio_create, name='precio_create'),
-    path('precios/<int:pk>/editar/', views.precio_update, name='precio_update'),
-    path('precios/<int:pk>/eliminar/', views.precio_delete, name='precio_delete'),
-
     # Búsqueda por disponibilidad
     path('buscar/', views.buscar_disponibilidad, name='buscar_disponibilidad'),
 ]

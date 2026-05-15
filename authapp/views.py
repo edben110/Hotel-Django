@@ -166,7 +166,7 @@ def home_view(request):
 
     if request.user.role == 'admin':
         # Reutilizar lógica existente del módulo reportes
-        from reportes.services import obtener_metricas_dashboard, obtener_actividad_reciente, obtener_datos_dashboard
+        from reportes.services import obtener_metricas_dashboard, obtener_actividad_reciente
         from django.urls import reverse
 
         context['metricas'] = obtener_metricas_dashboard()

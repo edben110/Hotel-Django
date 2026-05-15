@@ -41,28 +41,3 @@ class Habitacion(models.Model):
 
     def __str__(self):
         return f"Habitación {self.numero} - {self.tipo.nombre}"
-
-
-class PrecioTemporada(models.Model):
-    """Precios especiales por temporada para cada tipo de habitación."""
-    TEMPORADA_CHOICES = [
-        ('baja', 'Temporada Baja'),
-        ('media', 'Temporada Media'),
-        ('alta', 'Temporada Alta'),
-    ]
-
-    tipo_habitacion = models.ForeignKey(
-        TipoHabitacion, on_delete=models.CASCADE, related_name='precios_temporada'
-    )
-    temporada = models.CharField(max_length=20, choices=TEMPORADA_CHOICES)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-
-    class Meta:
-        verbose_name = 'Precio por Temporada'
-        verbose_name_plural = 'Precios por Temporada'
-        ordering = ['fecha_inicio']
-
-    def __str__(self):
-        return f"{self.tipo_habitacion.nombre} - {self.get_temporada_display()} (${self.precio})"
