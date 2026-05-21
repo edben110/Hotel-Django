@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, EmailVerificationToken
+from .models import CustomUser
 
 
 class RegisterForm(forms.ModelForm):
@@ -56,12 +56,11 @@ class RegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
-        user.is_active = False
-        user.is_verified = False
+        user.is_active = True
+        user.is_verified = True
 
         if commit:
             user.save()
-            EmailVerificationToken.objects.create(user=user)
 
         return user
 

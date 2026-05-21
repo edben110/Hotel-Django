@@ -100,9 +100,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 RUNNING_TESTS = 'test' in sys.argv
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -235,7 +232,7 @@ MESSAGE_TAGS = {
     messages_constants.ERROR: 'danger',
 }
 
-# Email Configuration
+# Email Configuration (se mantiene para uso futuro, sin verificación de cuenta)
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = config('EMAIL_HOST', default='')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
@@ -246,9 +243,6 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=5, cast=int)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 EMAIL_SUBJECT_PREFIX = config('EMAIL_SUBJECT_PREFIX', default='[Hotel] ')
-ENABLE_EMAIL_RETRY_WORKER = config('ENABLE_EMAIL_RETRY_WORKER', default=False, cast=bool)
-EMAIL_RETRY_INTERVAL_SECONDS = config('EMAIL_RETRY_INTERVAL_SECONDS', default=300, cast=int)
-EMAIL_RETRY_BATCH_SIZE = config('EMAIL_RETRY_BATCH_SIZE', default=20, cast=int)
 
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
 
