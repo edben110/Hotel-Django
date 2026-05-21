@@ -1,60 +1,75 @@
 {% extends "base.html" %}
 
-{% block title %}Cancelar reserva {{ reserva.codigo }}{% endblock %}
+{% block title %}Cancelar reserva - Áurea{% endblock %}
 
 {% block content %}
-<h1>Cancelar reserva <code>{{ reserva.codigo }}</code></h1>
+<style>
+    .page-wrapper { background:url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80') center center/cover no-repeat fixed; margin:-2rem -0.75rem -3rem; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 70px); position:relative; }
+    .page-wrapper::before { content:''; position:absolute; inset:0; background:rgba(245,240,235,.65); }
+    .page-wrapper > * { position:relative; z-index:1; }
+    @media(min-width:992px) { .page-wrapper { margin:-2rem calc(-1*(50vw - 570px)) -3rem; padding:3rem calc(50vw - 570px) 5rem; } }
+    @media(max-width:768px) { .page-wrapper { padding:1.5rem 1rem 3rem; } }
+    @media(max-width:576px) { .page-wrapper { padding:1rem .75rem 2.5rem; } }
 
-<div class="card border-warning mb-3">
-    <div class="card-body">
-        <h5>Resumen</h5>
-        <p class="mb-1">
-            Habitación {{ reserva.habitacion.numero }} ·
-            {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}
-        </p>
-        <p class="mb-1">Total pagado: <strong>${{ reserva.total }}</strong></p>
-        <p class="mb-1">
-            Días de anticipación: <strong>{{ reserva.dias_anticipacion }}</strong>
-        </p>
-        <p class="mb-0">
-            Reembolso aplicable según política:
-            <strong class="text-success">${{ reembolso_estimado }}</strong>
-        </p>
+    .cancel-main { background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.8); border-radius:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,.06); max-width:650px; margin:0 auto; overflow:hidden; }
+    .cancel-header { background:linear-gradient(145deg,#1a1a1a,#2c2c2c); padding:1.75rem 2rem; color:#fff; border-bottom:1px solid rgba(184,134,11,.2); }
+    .cancel-header h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:1.3rem; margin:0; }
+    .cancel-body { padding:2rem; }
+    .summary-box { background:rgba(184,134,11,.04); border:1px solid rgba(184,134,11,.12); border-radius:1rem; padding:1.25rem; margin-bottom:1.5rem; }
+    .summary-box p { margin-bottom:.4rem; font-size:.88rem; color:#444; }
+    .policy-card { border:1px solid rgba(184,134,11,.1); border-radius:1rem; overflow:hidden; margin-bottom:1.5rem; }
+    .policy-card .policy-header { background:rgba(184,134,11,.04); padding:.75rem 1.25rem; font-weight:600; font-size:.85rem; color:#1a1a1a; border-bottom:1px solid rgba(184,134,11,.08); }
+    .policy-card .policy-item { padding:.65rem 1.25rem; border-bottom:1px solid rgba(184,134,11,.06); display:flex; justify-content:space-between; font-size:.85rem; }
+    .policy-card .policy-item:last-child { border-bottom:none; }
+    .cancel-body .form-control, .cancel-body .form-select { border:1px solid #e8e0d5; background:#faf8f5; border-radius:.5rem; padding:.7rem 1rem; }
+    .cancel-body .form-control:focus { border-color:#b8860b; box-shadow:0 0 0 3px rgba(184,134,11,.1); background:#fff; }
+    .btn-danger-custom { background:#dc2626; color:#fff; border:none; border-radius:.5rem; padding:.65rem 1.25rem; font-weight:600; font-size:.88rem; transition:all .2s; }
+    .btn-danger-custom:hover { background:#b91c1c; color:#fff; transform:translateY(-1px); }
+    @media(max-width:576px) { .cancel-header { padding:1.25rem 1.5rem; } .cancel-body { padding:1.5rem; } }
+</style>
+
+<div class="page-wrapper">
+    <div class="cancel-main fade-in-up">
+        <div class="cancel-header">
+            <h1><i class="bi bi-x-circle"></i> Cancelar reserva <code style="color:#b8860b; background:rgba(184,134,11,.15); padding:.15rem .5rem; border-radius:.25rem; font-size:.85rem;">{{ reserva.codigo }}</code></h1>
+        </div>
+        <div class="cancel-body">
+            <div class="summary-box">
+                <p><strong>Habitación {{ reserva.habitacion.numero }}</strong> · {{ reserva.fecha_entrada|date:"d/m/Y" }} → {{ reserva.fecha_salida|date:"d/m/Y" }}</p>
+                <p>Total pagado: <strong style="color:#b8860b;">${{ reserva.total }}</strong></p>
+                <p>Días de anticipación: <strong>{{ reserva.dias_anticipacion }}</strong></p>
+                <p class="mb-0">Reembolso estimado: <strong style="color:#16a34a;">${{ reembolso_estimado }}</strong></p>
+            </div>
+
+            {% if politicas %}
+            <div class="policy-card">
+                <div class="policy-header"><i class="bi bi-info-circle" style="color:#b8860b;"></i> Política de cancelación</div>
+                {% for p in politicas %}
+                <div class="policy-item">
+                    <span>{{ p.dias_anticipacion }}+ día{{ p.dias_anticipacion|pluralize:"s" }} de anticipación</span>
+                    <strong style="color:#b8860b;">{{ p.porcentaje_reembolso }}% reembolso</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight:500; font-size:.8rem; color:#6b6b6b;">Motivo (opcional)</label>
+                    {{ form.motivo }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form.confirmar }}
+                    <label class="form-check-label" for="{{ form.confirmar.id_for_label }}" style="font-size:.88rem;">{{ form.confirmar.label }}</label>
+                    {% for error in form.confirmar.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn-danger-custom"><i class="bi bi-x-circle"></i> Confirmar cancelación</button>
+                    <a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn btn-outline-secondary" style="border-radius:.5rem;">Volver</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-{% if politicas %}
-<div class="card mb-3">
-    <div class="card-header"><strong>Política de cancelación</strong></div>
-    <ul class="list-group list-group-flush">
-        {% for p in politicas %}
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Cancelando con {{ p.dias_anticipacion }}+ día{{ p.dias_anticipacion|pluralize:"s" }} de anticipación</span>
-            <span><strong>{{ p.porcentaje_reembolso }}%</strong> de reembolso</span>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-<form method="post" novalidate>
-    {% csrf_token %}
-    <div class="mb-3">
-        <label class="form-label">Motivo (opcional)</label>
-        {{ form.motivo }}
-    </div>
-
-    <div class="form-check mb-3">
-        {{ form.confirmar }}
-        <label class="form-check-label" for="{{ form.confirmar.id_for_label }}">
-            {{ form.confirmar.label }}
-        </label>
-        {% for error in form.confirmar.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-    </div>
-
-    <button type="submit" class="btn btn-danger">
-        <i class="bi bi-x-circle"></i> Confirmar cancelación
-    </button>
-    <a href="{% url 'reservas:reserva_detail' codigo=reserva.codigo %}" class="btn btn-secondary">Volver</a>
-</form>
 {% endblock %}
